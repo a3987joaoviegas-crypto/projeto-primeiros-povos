@@ -2,124 +2,119 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 
-# Configuração da página
-st.set_page_config(page_title="Povos Antigos PT", layout="wide")
+st.set_page_config(page_title="Povos Pré-Romanos de Portugal", layout="wide")
 
-# Estilização CSS para o Cartão de Cidadão Preto com Letras Brancas
+# Estilização CSS: Cartão de Cidadão Preto e Branco
 st.markdown("""
     <style>
-    .cc-animal-container {
-        background-color: #1e1e1e;
-        color: white;
-        border-radius: 15px;
-        padding: 20px;
+    .cc-card {
+        background-color: #000000;
+        color: #ffffff;
+        border-radius: 10px;
+        padding: 15px;
         margin-bottom: 20px;
-        border: 1px solid #444;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        border: 1px solid #333;
+        font-family: 'Arial', sans-serif;
     }
-    .cc-header {
-        font-size: 0.8rem;
-        letter-spacing: 2px;
+    .cc-title {
+        font-size: 0.7rem;
         color: #888;
+        border-bottom: 1px solid #333;
         margin-bottom: 10px;
+        padding-bottom: 5px;
         text-transform: uppercase;
     }
-    .cc-foto {
+    .cc-photo {
         width: 100%;
-        height: 150px;
-        object-fit: cover;
-        border-radius: 10px;
-        margin-bottom: 15px;
-        border: 1px solid #333;
+        border-radius: 5px;
+        margin-bottom: 10px;
     }
-    .cc-info {
-        width: 100%;
-        font-family: 'Courier New', Courier, monospace;
-    }
-    .cc-campo { color: #aaa; font-size: 0.7rem; margin-top: 5px; }
-    .cc-valor { font-size: 1rem; font-weight: bold; margin-bottom: 5px; }
+    .label { color: #666; font-size: 0.7rem; }
+    .value { font-size: 0.9rem; margin-bottom: 8px; font-weight: bold; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- DATABASE ---
-povos_data = {
+# --- BASE DE DADOS COMPLETA ---
+povos = {
     "Lusitanos": {
-        "coords": [40.2, -7.5],
-        "ferramentas": ["Falcata (Espada Curva)", "Dardo de Arremesso", "Arado de Madeira", "Mó de Pedra"],
+        "coords": [40.3, -7.5],
+        "ferramentas": ["Falcata (Espada)", "Punhal de Antenas", "Dardo (Soliferrum)", "Escudo Caetra", "Arado de Madeira"],
         "animais": [
-            {
-                "nome": "Cavalo Lusitano",
-                "funcao": "Montada de Guerra",
-                "img": "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=400"
-            },
-            {
-                "nome": "Ovelha Bordaleira",
-                "funcao": "Produção de Lã/Leite",
-                "img": "https://images.unsplash.com/photo-1484557985045-edf25e08da73?w=400"
-            }
+            {"nome": "Cavalo Lusitano", "uso": "Guerra e Prestígio", "img": "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=300"},
+            {"nome": "Ovelha Bordaleira", "uso": "Lã e Alimentação", "img": "https://images.unsplash.com/photo-1484557985045-edf25e08da73?w=300"},
+            {"nome": "Cabra Serrana", "uso": "Leite e Carne", "img": "https://images.unsplash.com/photo-1524024973431-2ad916746881?w=300"}
         ]
     },
-    "Celtas": {
-        "coords": [41.5, -8.4],
-        "ferramentas": ["Machado de Ferro", "Fíbula em Bronze", "Caldeirão", "Serra de Metal"],
+    "Celtas (Celtici)": {
+        "coords": [38.5, -7.9],
+        "ferramentas": ["Machado de Ferro", "Torques de Ouro", "Mó de Pedra Transmontana", "Caldeirão de Bronze"],
         "animais": [
-            {
-                "nome": "Cão de Castro Laboreiro",
-                "funcao": "Guardião de Gado",
-                "img": "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400"
-            },
-            {
-                "nome": "Gado Barrosão",
-                "funcao": "Trabalho Pesado",
-                "img": "https://images.unsplash.com/photo-1545468843-2796674f1df2?w=400"
-            }
+            {"nome": "Gado Alentejano", "uso": "Trabalho Agrícola", "img": "https://images.unsplash.com/photo-1545468843-2796674f1df2?w=300"},
+            {"nome": "Porco Alentejano", "uso": "Alimentação (Bolota)", "img": "https://images.unsplash.com/photo-1594145070112-7096e79201f9?w=300"}
+        ]
+    },
+    "Galaicos": {
+        "coords": [41.7, -8.5],
+        "ferramentas": ["Gládio", "Hoz de Ferro (Colheita)", "Pedra de Funda", "Cerâmica Castreja"],
+        "animais": [
+            {"nome": "Cão de Castro Laboreiro", "uso": "Guarda de Rebanhos", "img": "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=300"},
+            {"nome": "Vaca Cachena", "uso": "Tração e Leite", "img": "https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=300"}
+        ]
+    },
+    "Conios": {
+        "coords": [37.2, -8.2],
+        "ferramentas": ["Escrita Tartéssica (Estelas)", "Anzóis de Cobre", "Ânforas de Vinho", "Redes de Pesca"],
+        "animais": [
+            {"nome": "Burro de Mirandês", "uso": "Transporte de Carga", "img": "https://images.unsplash.com/photo-1534145557161-469b768e987c?w=300"},
+            {"nome": "Galinha Pedrês", "uso": "Ovos e Carne", "img": "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=300"}
+        ]
+    },
+    "Túrdulos Oppidanos": {
+        "coords": [39.0, -8.8],
+        "ferramentas": ["Espada de Bronze", "Tear Vertical", "Moinho de Rotação", "Fíbula de Anular"],
+        "animais": [
+            {"nome": "Boi Bravo", "uso": "Simbolismo e Trabalho", "img": "https://images.unsplash.com/photo-1551333330-8049280d8591?w=300"}
         ]
     }
 }
 
-# --- SIDEBAR COM A SETINHA (EXPANDER) ---
+# --- SIDEBAR ---
 with st.sidebar:
-    st.title("🧭 Navegação")
-    with st.expander("▶ ESCOLHER POVO"):
-        selecao = st.radio("", list(povos_data.keys()))
+    st.header("🗺️ Menu Histórico")
+    with st.expander("▶ SELECIONAR POVO"):
+        escolha = st.radio("Lista de Povos:", list(povos.keys()))
 
-povo = povos_data[selecao]
+dados = povos[escolha]
 
-# --- LAYOUT PRINCIPAL ---
-st.title(f"Povo: {selecao}")
+# --- CONTEÚDO ---
+st.title(f"Antigos Povos: {escolha}")
 
-col_mapa, col_ferramentas, col_animais = st.columns([1.5, 1, 1.2])
+col_info, col_ferramentas, col_animais = st.columns([1.5, 0.8, 1.2])
 
-with col_mapa:
-    st.subheader("📍 Localização")
-    m = folium.Map(location=povo["coords"], zoom_start=7, tiles="CartoDB dark_matter")
-    folium.Marker(location=povo["coords"], tooltip=selecao).add_to(m)
-    st_folium(m, width=400, height=400)
+with col_info:
+    st.subheader("Localização Estimada")
+    m = folium.Map(location=dados["coords"], zoom_start=7, tiles="CartoDB dark_matter")
+    folium.Marker(location=dados["coords"], popup=escolha, icon=folium.Icon(color='white')).add_to(m)
+    st_folium(m, width=450, height=450)
 
 with col_ferramentas:
-    st.subheader("🛠️ Ferramentas")
-    for f in povo["ferramentas"]:
-        st.markdown(f"✅ **{f}**")
+    st.subheader("⚒️ Ferramentas")
+    for f in dados["ferramentas"]:
+        st.write(f"▪️ {f}")
 
 with col_animais:
     st.subheader("🪪 Cartão de Cidadão Animal")
-    for animal in povo["animais"]:
+    # Mostrar todos os animais do povo selecionado
+    for animal in dados["animais"]:
         st.markdown(f"""
-            <div class="cc-animal-container">
-                <div class="cc-header">República de Portugal Antiga</div>
-                <img src="{animal['img']}" class="cc-foto">
-                <div class="cc-info">
-                    <div class="cc-campo">NOME / NAME</div>
-                    <div class="cc-valor">{animal['nome']}</div>
-                    <div class="cc-campo">OCUPAÇÃO / OCCUPATION</div>
-                    <div class="cc-valor">{animal['funcao']}</div>
-                    <div class="cc-campo">POVO / ORIGIN</div>
-                    <div class="cc-valor">{selecao}</div>
-                </div>
+            <div class="cc-card">
+                <div class="cc-title">Documento de Identificação Animal</div>
+                <img src="{animal['img']}" class="cc-photo">
+                <div class="label">NOME COMUM</div>
+                <div class="value">{animal['nome']}</div>
+                <div class="label">FUNÇÃO NA QUINTA / TRIBO</div>
+                <div class="value">{animal['uso']}</div>
+                <div class="label">POVO DETENTOR</div>
+                <div class="value">{escolha}</div>
             </div>
         """, unsafe_allow_html=True)
-
-st.divider()
-st.info("💡 Este projeto está estruturado para o GitHub. Use o arquivo requirements.txt para o Streamlit Cloud.")
