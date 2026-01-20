@@ -4,68 +4,87 @@ import folium
 from streamlit_folium import st_folium
 
 # Configuração da página
-st.set_page_config(page_title="Povos Antigos de Portugal", layout="wide")
+st.set_page_config(page_title="Povos de Portugal", layout="wide")
 
-# --- DATABASE SIMULADA ---
-# Num projeto real, isto poderia estar num ficheiro CSV ou JSON
+# Estilo CSS para o "Cartão de Cidadão" dos animais e design
+st.markdown("""
+    <style>
+    .cc-animal {
+        border: 2px solid #2e4a62;
+        border-radius: 10px;
+        padding: 15px;
+        background-color: #f0f2f6;
+        margin-bottom: 10px;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    }
+    .cc-header {
+        color: #2e4a62;
+        font-weight: bold;
+        border-bottom: 1px solid #2e4a62;
+        margin-bottom: 10px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# --- DATABASE ---
 povos_data = {
     "Lusitanos": {
         "coords": [40.2, -7.5],
-        "descricao": "Ocupavam as terras entre os rios Douro e Tejo. Conhecidos pela resistência aos Romanos.",
-        "ferramentas": ["Falcata (Espada)", "Escudos de couro", "Arados de madeira", "Pontas de lança em bronze"],
-        "animais": ["Cavalos lusitanos", "Ovelhas", "Cabras", "Porcos"],
-        "cor": "green"
+        "descricao": "Guerreiros e pastores da zona central de Portugal.",
+        "ferramentas": ["Falcata (Espada)", "Escudo Caetra", "Arado de Madeira"],
+        "animais": [
+            {"nome": "Cavalo Lusitano", "origem": "Serra da Estrela", "funcao": "Guerra/Transporte"},
+            {"nome": "Ovelha Bordaleira", "origem": "Vales do Mondego", "funcao": "Lã e Leite"}
+        ]
     },
     "Celtas": {
         "coords": [41.5, -8.4],
-        "descricao": "Presentes sobretudo no Norte e Alentejo. Mestres da metalurgia e da cultura dos castros.",
-        "ferramentas": ["Fíbulas de ouro", "Machados de ferro", "Mós manuais", "Torques"],
-        "animais": ["Gado vacum", "Cães de caça", "Ovelhas", "Porcos"],
-        "cor": "blue"
-    },
-    "Conios": {
-        "coords": [37.2, -8.0],
-        "descricao": "Habitavam o Algarve e Baixo Alentejo. Tiveram grande influência da escrita tartéssica.",
-        "ferramentas": ["Estelas de pedra escrita", "Ânforas de cerâmica", "Anzóis de pesca"],
-        "animais": ["Peixe (aquicultura primitiva)", "Gado", "Aves de capoeira"],
-        "cor": "orange"
+        "descricao": "Mestres da metalurgia do ferro e construtores de Castros.",
+        "ferramentas": ["Fíbula de Bronze", "Machado de Ferro", "Mó de Pedra"],
+        "animais": [
+            {"nome": "Gado Barrosão", "origem": "Minho/Gerês", "funcao": "Trabalho Agrícola"},
+            {"nome": "Cão de Castro Laboreiro", "origem": "Planalto de Castro", "funcao": "Guarda de Rebanho"}
+        ]
     }
 }
 
-# --- SIDEBAR ---
-st.sidebar.title("🏛️ Povos de Portugal")
-st.sidebar.markdown("Selecione um povo para detalhar:")
-selecao = st.sidebar.selectbox("Povo:", list(povos_data.keys()))
+# --- SIDEBAR COM SETINHA (EXPANDER) ---
+st.sidebar.title("🏛️ Navegação")
 
-povo = povos_data[selecao]
+with st.sidebar.expander("▶ Ver Povos de Portugal"):
+    escolha_povo = st.radio("Selecione um povo para explorar:", list(povos_data.keys()))
 
-# Secções da Sidebar baseadas na seleção
-st.sidebar.header(f"🛠️ Ferramentas - {selecao}")
-for f in povo["ferramentas"]:
-    st.sidebar.write(f"- {f}")
-
-st.sidebar.header(f"🐖 Animais de Quinta")
-for a in povo["animais"]:
-    st.sidebar.write(f"- {a}")
+povo = povos_data[escolha_povo]
 
 # --- CORPO PRINCIPAL ---
-st.title(f"Explorador Histórico: {selecao}")
-st.write(povo["descricao"])
+st.title(f"Explorador Histórico: {escolha_povo}")
 
-# Configuração do Mapa
-m = folium.Map(location=[39.5, -8.0], zoom_start=6, tiles="CartoDB positron")
+col1, col2 = st.columns([2, 1])
 
-# Adicionar marcadores de todos os povos
-for nome, info in povos_data.items():
-    icon_color = "red" if nome == selecao else info["cor"]
-    folium.Marker(
-        location=info["coords"],
-        popup=nome,
-        tooltip=nome,
-        icon=folium.Icon(color=icon_color, icon="info-sign")
-    ).add_to(m)
+with col1:
+    st.subheader("📍 Localização e História")
+    m = folium.Map(location=[39.5, -8.0], zoom_start=6, tiles="CartoDB positron")
+    folium.Marker(location=povo["coords"], popup=escolha_povo, icon=folium.Icon(color="red")).add_to(m)
+    st_folium(m, width=700, height=400)
+    st.write(povo["descricao"])
 
-# Exibir o mapa
-st_folium(m, width=700, height=500)
+with col2:
+    # SECÇÃO DE FERRAMENTAS
+    st.subheader("🛠️ Ferramentas")
+    for f in povo["ferramentas"]:
+        st.info(f)
 
-st.info("💡 Clique nos marcadores no mapa ou use a barra lateral para navegar.")
+    # SECÇÃO DE ANIMAIS (CARTÃO DE CIDADÃO)
+    st.subheader("🐖 Animais (CC)")
+    for animal in povo["animais"]:
+        st.markdown(f"""
+            <div class="cc-animal">
+                <div class="cc-header">CARTÃO DE CIDADÃO ANIMAL</div>
+                <b>Nome:</b> {animal['nome']}<br>
+                <b>Natural de:</b> {animal['origem']}<br>
+                <b>Ocupação:</b> {animal['funcao']}
+            </div>
+        """, unsafe_allow_html=True)
+
+st.divider()
+st.caption("Código disponível no GitHub | Desenvolvido com Streamlit")
