@@ -2,116 +2,157 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 
-st.set_page_config(page_title="Povos Históricos de Portugal", layout="wide")
+# Configuração da Página
+st.set_page_config(page_title="Portugal Antigo: Mundovivo", layout="wide")
 
-# Estilo CSS: Cartão de Cidadão (Preto Total)
+# Estilo CSS: Cartão de Cidadão Preto e Branco (High Contrast)
 st.markdown("""
     <style>
+    .stApp { background-color: #0e1117; color: white; }
     .cc-card {
         background-color: #000000;
         color: #ffffff;
-        border-radius: 12px;
+        border-radius: 15px;
         padding: 20px;
         margin-bottom: 25px;
-        border: 2px solid #333;
-        box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+        border: 2px solid #ffffff;
     }
     .cc-title {
-        font-size: 0.75rem;
-        color: #ff4b4b; /* Um toque de cor no topo */
-        font-weight: bold;
+        font-size: 0.7rem;
+        letter-spacing: 3px;
+        color: #888;
         border-bottom: 1px solid #333;
         margin-bottom: 12px;
-        letter-spacing: 2px;
+        text-align: center;
     }
-    .cc-photo {
+    .img-box {
         width: 100%;
-        height: 200px;
+        height: 180px;
         object-fit: cover;
         border-radius: 8px;
-        margin-bottom: 15px;
         border: 1px solid #444;
+        margin-bottom: 10px;
     }
-    .label { color: #888; font-size: 0.7rem; text-transform: uppercase; margin-top: 10px; }
-    .value { font-size: 1rem; font-weight: bold; border-bottom: 1px solid #222; }
+    .label { color: #888; font-size: 0.65rem; text-transform: uppercase; margin-top: 8px; }
+    .value { font-size: 0.95rem; font-weight: bold; font-family: 'Courier New', monospace; }
+    .tool-card {
+        background: #1a1a1a;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border-left: 4px solid #ffffff;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-# --- DATABASE COMPLETA ---
+# --- BASE DE DADOS GIGANTE ---
+# Usando keywords para imagens garantidas do Unsplash
 povos = {
     "Lusitanos": {
         "coords": [40.3, -7.5],
-        "ferramentas": ["Falcata", "Escudo Caetra", "Arado de Madeira", "Pontas de Lança", "Adagas de Bronze"],
+        "ferramentas": [
+            {"nome": "Falcata (Espada)", "img": "https://source.unsplash.com/400x300/?sword,ancient"},
+            {"nome": "Escudo Caetra", "img": "https://source.unsplash.com/400x300/?shield,wood"},
+            {"nome": "Arado de Madeira", "img": "https://source.unsplash.com/400x300/?plow,farm"}
+        ],
         "animais": [
-            {"nome": "Cavalo Lusitano", "uso": "Guerra e Caça", "img": "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=400"},
-            {"nome": "Ovelha Bordaleira", "uso": "Produção de Lã", "img": "https://images.unsplash.com/photo-1484557985045-edf25e08da73?w=400"},
-            {"nome": "Cabra da Serra", "uso": "Leite e Queijo", "img": "https://images.unsplash.com/photo-1524024973431-2ad916746881?w=400"}
+            {"nome": "Cavalo Lusitano", "desc": "Guerra", "img": "https://source.unsplash.com/400x300/?horse,lusitano"},
+            {"nome": "Ovelha", "desc": "Lã", "img": "https://source.unsplash.com/400x300/?sheep"},
+            {"nome": "Cabra", "desc": "Leite", "img": "https://source.unsplash.com/400x300/?goat"},
+            {"nome": "Porco", "desc": "Alimento", "img": "https://source.unsplash.com/400x300/?pig"}
         ]
     },
     "Celtas": {
-        "coords": [41.5, -7.8],
-        "ferramentas": ["Machado de Ferro", "Mó de Pedra", "Torques", "Caldeirão", "Tesouras de Tosa"],
+        "coords": [39.0, -7.2],
+        "ferramentas": [
+            {"nome": "Torques de Ouro", "img": "https://source.unsplash.com/400x300/?gold,jewelry"},
+            {"nome": "Machado de Ferro", "img": "https://source.unsplash.com/400x300/?axe,iron"},
+            {"nome": "Caldeirão", "img": "https://source.unsplash.com/400x300/?cauldron"}
+        ],
         "animais": [
-            {"nome": "Gado Barrosão", "uso": "Tração de Carros", "img": "https://images.unsplash.com/photo-1545468843-2796674f1df2?w=400"},
-            {"nome": "Porco Bísaro", "uso": "Alimentação Base", "img": "https://images.unsplash.com/photo-1594145070112-7096e79201f9?w=400"},
-            {"nome": "Cão de Caça", "uso": "Montaria e Proteção", "img": "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400"}
+            {"nome": "Boi Barrosão", "desc": "Tração", "img": "https://source.unsplash.com/400x300/?ox,bull"},
+            {"nome": "Cão Lobo", "desc": "Guarda", "img": "https://source.unsplash.com/400x300/?wolf,dog"}
         ]
     },
     "Galaicos": {
-        "coords": [41.8, -8.4],
-        "ferramentas": ["Gládio Castrejo", "Tear", "Hoz de Ferro", "Cerâmica Decorada"],
+        "coords": [41.7, -8.4],
+        "ferramentas": [
+            {"nome": "Hoz (Foice)", "img": "https://source.unsplash.com/400x300/?sickle"},
+            {"nome": "Moinho Manual", "img": "https://source.unsplash.com/400x300/?stone,mill"}
+        ],
         "animais": [
-            {"nome": "Vaca Cachena", "uso": "Sobrevivência na Serra", "img": "https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=400"},
-            {"nome": "Ponei Garrano", "uso": "Transporte de Minério", "img": "https://images.unsplash.com/photo-1598974357851-cb8143c0f243?w=400"}
+            {"nome": "Vaca Cachena", "desc": "Montanha", "img": "https://source.unsplash.com/400x300/?cow,mountain"},
+            {"nome": "Garrano", "desc": "Ponei de Carga", "img": "https://source.unsplash.com/400x300/?pony"}
         ]
     },
     "Conios": {
-        "coords": [37.3, -8.0],
-        "ferramentas": ["Estela Escrita", "Anzóis", "Redes de Pesca", "Ânforas de Azeite"],
+        "coords": [37.2, -8.1],
+        "ferramentas": [
+            {"nome": "Estela Escrita", "img": "https://source.unsplash.com/400x300/?hieroglyph,stone"},
+            {"nome": "Rede de Pesca", "img": "https://source.unsplash.com/400x300/?fishing,net"}
+        ],
         "animais": [
-            {"nome": "Burro do Algarve", "uso": "Carga de Mercadorias", "img": "https://images.unsplash.com/photo-1534145557161-469b768e987c?w=400"},
-            {"nome": "Galinha Pedrês", "uso": "Aves de Quintal", "img": "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=400"}
+            {"nome": "Burro", "desc": "Transporte Sul", "img": "https://source.unsplash.com/400x300/?donkey"},
+            {"nome": "Peixe", "desc": "Aquicultura", "img": "https://source.unsplash.com/400x300/?fish"}
         ]
+    },
+    "Túrdulos": {
+        "coords": [38.8, -8.9],
+        "ferramentas": [{"nome": "Ânfora", "img": "https://source.unsplash.com/400x300/?pottery,ancient"}],
+        "animais": [{"nome": "Touro", "desc": "Sagrado", "img": "https://source.unsplash.com/400x300/?bull,black"}]
     }
 }
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.title("🧭 Menu")
-    with st.expander("▶ VER POVOS"):
-        escolha = st.radio("Selecione:", list(povos.keys()))
+    st.title("🏛️ MundoVivo: Povos")
+    with st.expander("▶ SELECIONAR POVO"):
+        escolha = st.radio("Escolha um povo antigo:", list(povos.keys()))
 
 dados = povos[escolha]
 
-# --- ECRÃ PRINCIPAL ---
-st.title(f"Povo: {escolha}")
+# --- LAYOUT ---
+st.title(f"Exploração: {escolha}")
 
-col_mapa, col_ferramentas, col_animais = st.columns([1.2, 0.8, 1.2])
+col_map, col_tools, col_animals = st.columns([1.2, 1, 1.2])
 
-with col_mapa:
-    st.subheader("📍 Território")
+with col_map:
+    st.subheader("📍 Localização")
     m = folium.Map(location=dados["coords"], zoom_start=7, tiles="CartoDB dark_matter")
-    folium.Marker(location=dados["coords"], tooltip=escolha).add_to(m)
-    st_folium(m, width=400, height=450)
+    folium.Marker(location=dados["coords"], popup=escolha).add_to(m)
+    st_folium(m, width=400, height=400, key="mapa")
 
-with col_ferramentas:
-    st.subheader("🛠️ Ferramentas")
+with col_tools:
+    st.subheader("⚒️ Ferramentas")
     for f in dados["ferramentas"]:
-        st.markdown(f"🔳 {f}")
-
-with col_animais:
-    st.subheader("🪪 Cartão de Cidadão Animal")
-    for animal in dados["animais"]:
-        # Se não houver imagem, usa um placeholder cinzento
-        img_url = animal.get("img", "https://via.placeholder.com/400x200?text=Sem+Imagem")
-        
         st.markdown(f"""
-            <div class="cc-card">
-                <div class="cc-title">REPUBLICA POVOS ANTIGOS</div>
-                <img src="{img_url}" class="cc-photo">
-                <div class="label">NOME</div>
-                <div class="value">{animal['nome']}</div>
-                <div class="label">FUNÇÃO</div>
-                <div class="value">{animal['uso']}</div>
+            <div class="tool-card">
+                <img src="{f['img']}" class="img-box" style="height: 100px;">
+                <div class="value">{f['nome']}</div>
             </div>
         """, unsafe_allow_html=True)
+
+with col_animals:
+    st.subheader("🪪 Cartões de Cidadão")
+    for a in dados["animais"]:
+        st.markdown(f"""
+            <div class="cc-card">
+                <div class="cc-title">REPÚBLICA DOS POVOS ANTIGOS</div>
+                <img src="{a['img']}" class="cc-foto img-box">
+                <div class="label">NOME DO ANIMAL</div>
+                <div class="value">{a['nome']}</div>
+                <div class="label">UTILIZAÇÃO</div>
+                <div class="value">{a['desc']}</div>
+            </div>
+        """, unsafe_allow_html=True)
+
+# --- LISTA GERAL DE TODOS OS ANIMAIS (Final da Página) ---
+st.divider()
+st.subheader("📜 Lista Geral de Todos os Animais das Quintas Antigas")
+todos_animais = []
+for p in povos.values():
+    for a in p["animais"]:
+        if a["nome"] not in todos_animais:
+            todos_animais.append(a["nome"])
+
+st.write(", ".join(todos_animais))
