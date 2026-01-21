@@ -2,124 +2,104 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 
-# 1. Configuração de Nome e Layout
 st.set_page_config(page_title="Primeiros Povos de Portugal", layout="wide")
 
-# Estilo Visual Mundovivo - Total Black
+# Estilo Visual Total Black
 st.markdown("""
     <style>
     .stApp { background-color: #000000; color: white; }
-    .section-title { color: white; border-left: 4px solid #ffffff; padding-left: 15px; margin: 30px 0 15px 0; font-size: 1.3rem; }
-    .cc-card {
-        background-color: #111111; color: #ffffff; border: 1px solid #333;
-        border-radius: 12px; padding: 15px; text-align: center; height: 100%;
-    }
-    .cc-header { font-size: 0.5rem; color: #888; border-bottom: 1px solid #222; margin-bottom: 10px; letter-spacing: 2px; }
-    .img-real { 
-        width: 100%; height: 160px; object-fit: cover; border-radius: 8px; 
-        margin-bottom: 10px; border: 1px solid #444; background-color: #222;
-    }
-    .label { color: #666; font-size: 0.6rem; text-transform: uppercase; margin-top: 10px; }
-    .value { font-size: 0.9rem; font-weight: bold; color: #fff; }
-    .info-box { 
-        background: #111111; padding: 20px; border-radius: 10px; 
-        border: 1px solid #333; border-top: 4px solid #ffffff; margin-bottom: 20px; 
-    }
-    .epoch-detail { color: #aaa; font-size: 0.85rem; line-height: 1.4; }
+    .section-title { color: white; border-left: 4px solid #ffffff; padding-left: 15px; margin: 30px 0 10px 0; font-size: 1.2rem; }
+    .info-box { background: #111111; padding: 20px; border-radius: 10px; border: 1px solid #333; margin-bottom: 20px; }
+    .cc-card { background-color: #111111; color: #ffffff; border: 1px solid #333; border-radius: 12px; padding: 15px; text-align: center; height: 100%; }
+    .img-real { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; border: 1px solid #444; }
+    .label { color: #666; font-size: 0.6rem; text-transform: uppercase; }
+    .value { font-size: 0.85rem; font-weight: bold; color: #fff; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- BASE DE DATA AMPLIADA ---
-povos_db = {
-    "Lusitanos (Centro-Interior)": {
-        "coords": [40.3, -7.5],
-        "epoca_info": {
-            "Sociedade": "Tribos independentes lideradas por chefes guerreiros.",
-            "Habitação": "Casas de pedra retangulares ou circulares no topo de montes.",
-            "Economia": "Pastoreio, caça e metalurgia de bronze e ouro."
-        },
-        "historia": "Guerreiros montanheses conhecidos pela resistência feroz liderada por Viriato.",
-        "ferramentas": [
-            {"n": "Falcata (Espada)", "img": "https://images.unsplash.com/photo-1590256153835-bd3c4014292c?w=400"},
-            {"n": "Escudo Caetra", "img": "https://images.unsplash.com/photo-1615678815958-5d413b70b653?w=400"},
-            {"n": "Ponta de Lança", "img": "https://images.unsplash.com/photo-1510414695470-24970f807365?w=400"},
-            {"n": "Tecelagem Manual", "img": "https://images.unsplash.com/photo-1615560113840-06900693f185?w=400"}
-        ],
-        "animais": [
-            {"n": "Cavalo Lusitano", "uso": "Guerra", "img": "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=400"},
-            {"n": "Porco Alentejano", "uso": "Pastoreio", "img": "https://images.unsplash.com/photo-1594145070112-7096e79201f9?w=400"},
-            {"n": "Ovelha Bordaleira", "uso": "Lã e Leite", "img": "https://images.unsplash.com/photo-1484557985045-edf25e08da73?w=400"},
-            {"n": "Cão de Fila", "uso": "Guarda", "img": "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400"}
-        ]
+# --- DATABASE DE TODAS AS ÉPOCAS ---
+historia_pt = {
+    "1. Pré-História": {
+        "coord": [38.5, -8.0],
+        "info": "Época dos grandes monumentos de pedra (Megalitismo).",
+        "detalhe": "Habitantes: Povos Recoletores. Habitação: Grutas e abrigos. Economia: Caça.",
+        "ferramentas": [{"n": "Machado de Pedra", "img": "https://images.unsplash.com/photo-1510414695470-24970f807365?w=400"}],
+        "animais": [{"n": "Lobo", "uso": "Selvagem", "img": "https://images.unsplash.com/photo-1590424753042-32244f05563c?w=400"}]
     },
-    "Celtas e Galaicos (Norte)": {
-        "coords": [41.5, -8.3],
-        "epoca_info": {
-            "Sociedade": "Cultura castreja com clãs familiares organizados.",
-            "Habitação": "Castros: aldeias fortificadas com casas circulares de pedra.",
-            "Economia": "Agricultura de cereais e mineração avançada de ouro."
-        },
-        "historia": "Mestres da metalurgia e habitantes de fortalezas naturais conhecidas como Castros.",
-        "ferramentas": [
-            {"n": "Torques (Joia)", "img": "https://images.unsplash.com/photo-1611085583191-a3b1a6a939db?w=400"},
-            {"n": "Machado de Ferro", "img": "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=400"},
-            {"n": "Mó de Pedra", "img": "https://images.unsplash.com/photo-1603566270543-92f750d03704?w=400"},
-            {"n": "Caldeirão", "img": "https://images.unsplash.com/photo-1582738411706-bfc8e691d1c2?w=400"}
-        ],
-        "animais": [
-            {"n": "Vaca Cachena", "uso": "Tração", "img": "https://images.unsplash.com/photo-1545468843-2796674f1df2?w=400"},
-            {"n": "Boi Barrosão", "uso": "Trabalho Agrícola", "img": "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=400"},
-            {"n": "Cão de Castro", "uso": "Proteção Gado", "img": "https://images.unsplash.com/photo-1544568100-847a948585b9?w=400"},
-            {"n": "Garrano", "uso": "Transporte", "img": "https://images.unsplash.com/photo-1598974357851-cb8143c0f243?w=400"}
-        ]
+    "2. Lusitanos": {
+        "coord": [40.3, -7.5],
+        "info": "Guerreiros da Idade do Ferro liderados por Viriato.",
+        "detalhe": "Habitação: Castros fortificados. Sociedade: Guerreira e independente.",
+        "ferramentas": [{"n": "Falcata", "img": "https://images.unsplash.com/photo-1590256153835-bd3c4014292c?w=400"}],
+        "animais": [{"n": "Porco Alentejano", "uso": "Alimento", "img": "https://images.unsplash.com/photo-1594145070112-7096e79201f9?w=400"}]
+    },
+    "3. Romanos": {
+        "coord": [38.4, -7.9],
+        "info": "Fundação da Província da Lusitânia.",
+        "detalhe": "Construção de estradas, pontes e cidades como Évora e Conimbriga.",
+        "ferramentas": [{"n": "Ânfora", "img": "https://images.unsplash.com/photo-1578507065211-1c4e99a5fd24?w=400"}],
+        "animais": [{"n": "Boi", "uso": "Arado", "img": "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=400"}]
+    },
+    "4. Visigodos": {
+        "coord": [38.1, -7.8],
+        "info": "Reinos Germânicos que sucederam aos Romanos.",
+        "detalhe": "Época de transição e cristianização profunda da península.",
+        "ferramentas": [{"n": "Coroa Votiva", "img": "https://images.unsplash.com/photo-1611085583191-a3b1a6a939db?w=400"}],
+        "animais": [{"n": "Cavalo", "uso": "Transporte", "img": "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=400"}]
+    },
+    "5. Árabes (Al-Andalus)": {
+        "coord": [37.1, -7.9],
+        "info": "Influência islâmica no Sul (Algarve e Alentejo).",
+        "detalhe": "Novas técnicas de rega, pomares e avanços na ciência e poesia.",
+        "ferramentas": [{"n": "Astrolábio", "img": "https://images.unsplash.com/photo-1603566270543-92f750d03704?w=400"}],
+        "animais": [{"n": "Burro", "uso": "Carga", "img": "https://images.unsplash.com/photo-1534145557161-469b768e987c?w=400"}]
+    },
+    "6. Fundação do Reino": {
+        "coord": [41.4, -8.2],
+        "info": "Afonso Henriques proclama a independência (1143).",
+        "detalhe": "Reconquista cristã e nascimento de Portugal em Guimarães.",
+        "ferramentas": [{"n": "Espada Real", "img": "https://images.unsplash.com/photo-1590256153835-bd3c4014292c?w=400"}],
+        "animais": [{"n": "Cão de Guarda", "uso": "Castelo", "img": "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400"}]
+    },
+    "7. Descobrimentos": {
+        "coord": [38.7, -9.2],
+        "info": "A expansão marítima portuguesa pelo mundo.",
+        "detalhe": "Invenção da Caravela e mapeamento dos oceanos.",
+        "ferramentas": [{"n": "Bússola", "img": "https://images.unsplash.com/photo-1516937941344-00b4e0337589?w=400"}],
+        "animais": [{"n": "Papagaio", "uso": "Exótico", "img": "https://images.unsplash.com/photo-1552728089-57bdde30fc3e?w=400"}]
     }
 }
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.title("🗺️ EXPLORAÇÃO")
-    modo = st.radio("Selecione o Modo:", ["Regiões", "Evolução Histórica"])
-    selecionado = st.selectbox("Escolha o Povo/Época:", list(povos_db.keys()))
-    dados = povos_db[selecionado]
+    st.title("🇵🇹 HISTÓRIA DE PORTUGAL")
+    epoca = st.select_slider("PASSE A ÉPOCA AQUI:", options=list(historia_pt.keys()))
+    dados = historia_pt[epoca]
 
-# --- CONTEÚDO ---
-st.title("Primeiros Povos de Portugal")
+# --- CONTEÚDO PRINCIPAL ---
+st.title(f"Época: {epoca}")
 
-# Informações Detalhadas da Época
 st.markdown(f"""
-<div class='info-box'>
-    <h3>Época: {selecionado}</h3>
-    <p><b>Resumo:</b> {dados['historia']}</p>
-    <hr style='border: 0.1px solid #333'>
-    <div class='epoch-detail'>
-        <b>🏠 Habitação:</b> {dados['epoca_info']['Habitação']}<br>
-        <b>🤝 Sociedade:</b> {dados['epoca_info']['Sociedade']}<br>
-        <b>💰 Economia:</b> {dados['epoca_info']['Economia']}
-    </div>
+<div class="info-box">
+    <h3>{dados['info']}</h3>
+    <p>{dados['detalhe']}</p>
 </div>
 """, unsafe_allow_html=True)
 
 # Mapa
-m = folium.Map(location=[39.5, -8.0], zoom_start=6, tiles="CartoDB dark_matter")
-folium.Marker(dados["coords"], icon=folium.Icon(color="white")).add_to(m)
-st_folium(m, width="100%", height=350)
+m = folium.Map(location=dados["coord"], zoom_start=7, tiles="CartoDB dark_matter")
+folium.Marker(dados["coord"], icon=folium.Icon(color="red")).add_to(m)
+st_folium(m, width="100%", height=300)
 
-# Listas Horizontais (Imagens Reais)
-st.markdown("<div class='section-title'>⚒️ Tecnologia e Artefactos</div>", unsafe_allow_html=True)
+# Listas Horizontais
+st.markdown("<h3 class='section-title'>⚒️ Ferramentas da Época</h3>", unsafe_allow_html=True)
 cols_f = st.columns(4)
 for i, f in enumerate(dados["ferramentas"]):
-    with cols_f[i % 4]:
-        st.markdown(f'<div class="cc-card"><img src="{f["img"]}" class="img-real"><div class="label">OBJETO</div><div class="value">{f["n"]}</div></div>', unsafe_allow_html=True)
+    with cols_f[i]:
+        st.markdown(f'<div class="cc-card"><img src="{f["img"]}" class="img-real"><div class="label">ARTEFACTO</div><div class="value">{f["n"]}</div></div>', unsafe_allow_html=True)
 
-st.markdown("<div class='section-title'>🪪 Cartão de Cidadão Animal</div>", unsafe_allow_html=True)
+st.markdown("<h3 class='section-title'>🪪 Animais e Vida</h3>", unsafe_allow_html=True)
 cols_a = st.columns(4)
 for i, a in enumerate(dados["animais"]):
-    with cols_a[i % 4]:
-        st.markdown(f"""<div class="cc-card">
-            <div class="cc-header">DOC. IDENTIFICAÇÃO ANCESTRAL</div>
-            <img src="{a['img']}" class="img-real">
-            <div class="label">ESPÉCIE/RAÇA</div>
-            <div class="value">{a['n']}</div>
-            <div class="label">FUNÇÃO NA ÉPOCA</div>
-            <div class="value">{a['uso']}</div>
-        </div>""", unsafe_allow_html=True)
+    with cols_a[i]:
+        st.markdown(f'<div class="cc-card"><img src="{a["img"]}" class="img-real"><div class="label">NOME</div><div class="value">{a["n"]}</div><div class="label">USO</div><div class="value">{a["uso"]}</div></div>', unsafe_allow_html=True)
