@@ -2,143 +2,126 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 
-st.set_page_config(page_title="MundoVivo: Portugal Ancestral", layout="wide")
+st.set_page_config(page_title="MundoVivo: Povos Reais de Portugal", layout="wide")
 
-# Estilo Visual: Dark Mode, Cartão de Cidadão e Tabelas
+# CSS para Cartão de Cidadão Preto e Imagens Reais
 st.markdown("""
     <style>
-    .stApp { background-color: #050505; color: white; }
-    .section-header {
-        background: linear-gradient(90deg, #1f1f1f, #000000);
-        padding: 10px;
-        border-left: 6px solid #ff4b4b;
-        margin: 30px 0 15px 0;
-        font-size: 1.5rem;
-        font-weight: bold;
+    .stApp { background-color: #000000; color: white; }
+    .section-title {
+        color: white;
+        border-left: 4px solid #ffffff;
+        padding-left: 10px;
+        margin-top: 30px;
+        font-family: 'Helvetica', sans-serif;
     }
     .cc-card {
-        background-color: #000000;
+        background-color: #111111;
         color: #ffffff;
-        border: 2px solid #333;
-        border-radius: 12px;
+        border: 1px solid #333;
+        border-radius: 8px;
         padding: 15px;
-        margin-bottom: 15px;
-        transition: 0.3s;
+        text-align: left;
     }
-    .cc-card:hover { border-color: #ff4b4b; }
-    .cc-title { font-size: 0.6rem; color: #666; text-align: center; letter-spacing: 2px; }
-    .img-box {
+    .cc-header {
+        font-size: 0.55rem;
+        color: #777;
+        text-align: center;
+        border-bottom: 1px solid #222;
+        margin-bottom: 10px;
+        letter-spacing: 1px;
+    }
+    .img-real {
         width: 100%;
-        height: 140px;
-        object-fit: cover;
-        border-radius: 6px;
-        margin: 10px 0;
-        border: 1px solid #222;
+        height: 150px;
+        object-fit: contain;
+        background-color: #000;
+        border-radius: 4px;
+        margin-bottom: 10px;
     }
     .label { color: #555; font-size: 0.6rem; text-transform: uppercase; }
-    .value { font-size: 0.9rem; font-weight: bold; border-bottom: 1px solid #111; margin-bottom: 8px; }
-    .desc-text { font-size: 0.8rem; color: #aaa; font-style: italic; }
+    .value { font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; color: #eee; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- BASE DE DADOS MASSIVA ---
-povos_db = {
+# --- DATABASE COM LINKS DE IMAGENS REAIS ---
+povos = {
     "Lusitanos": {
         "coords": [40.3, -7.5],
-        "historia": "Guerreiros da Serra da Estrela, mestres da guerrilha e da pastorícia transumante.",
         "ferramentas": [
-            {"n": "Falcata Lusitana", "desc": "Espada curva de gume interior.", "img": "https://images.unsplash.com/photo-1590256153835-bd3c4014292c?q=80&w=400"},
-            {"n": "Escudo Caetra", "desc": "Escudo redondo e pequeno de couro.", "img": "https://images.unsplash.com/photo-1615678815958-5d413b70b653?q=80&w=400"},
-            {"n": "Arado de Madeira", "desc": "Essencial para o cultivo de cereais.", "img": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=400"},
-            {"n": "Fuso de Tecelagem", "desc": "Para fiar a lã das ovelhas.", "img": "https://images.unsplash.com/photo-1615560113840-06900693f185?q=80&w=400"}
+            {"n": "Falcata (Espada Real)", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Falcata_de_Almedinilla_%28M.A.N.Inv.2005-59-1%29_01.jpg/800px-Falcata_de_Almedinilla_%28M.A.N.Inv.2005-59-1%29_01.jpg"},
+            {"n": "Caetra (Escudo)", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Caetra.png/440px-Caetra.png"},
+            {"n": "Arado Antigo", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Alt%C3%A4gyptischer_Maler_um_1200_v._Chr._001.jpg/600px-Alt%C3%A4gyptischer_Maler_um_1200_v._Chr._001.jpg"}
         ],
         "animais": [
-            {"n": "Cavalo Lusitano", "uso": "Guerra e Caça", "img": "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?q=80&w=400"},
-            {"n": "Ovelha Bordaleira", "uso": "Lã e Leite", "img": "https://images.unsplash.com/photo-1484557985045-edf25e08da73?q=80&w=400"},
-            {"n": "Cão de Fila", "uso": "Proteção de Rebanho", "img": "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?q=80&w=400"},
-            {"n": "Abelhas", "uso": "Mel e Cera", "img": "https://images.unsplash.com/photo-1581404476143-fb31d742929f?q=80&w=400"}
+            {"n": "Cavalo Lusitano", "uso": "Guerra", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Lusitano_2.jpg/800px-Lusitano_2.jpg"},
+            {"n": "Ovelha Bordaleira", "uso": "Lã Serra Estrela", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Sheep_St_Johns_Island.jpg/800px-Sheep_St_Johns_Island.jpg"}
         ]
     },
-    "Celtas (Norte e Alentejo)": {
-        "coords": [41.5, -8.0],
-        "historia": "Introduziram a metalurgia do ferro e a cultura dos Castros fortificados.",
+    "Celtas / Galaicos": {
+        "coords": [41.5, -8.3],
         "ferramentas": [
-            {"n": "Machado de Ferro", "desc": "Ferramenta de corte e combate.", "img": "https://images.unsplash.com/photo-1580910051074-3eb694886505?q=80&w=400"},
-            {"n": "Caldeirão de Bronze", "desc": "Uso em banquetes e rituais.", "img": "https://images.unsplash.com/photo-1582738411706-bfc8e691d1c2?q=80&w=400"},
-            {"n": "Mó de Pedra", "desc": "Moagem manual de grãos.", "img": "https://images.unsplash.com/photo-1603566270543-92f750d03704?q=80&w=400"},
-            {"n": "Torques", "desc": "Colar de ouro, símbolo de status.", "img": "https://images.unsplash.com/photo-1611085583191-a3b1a6a939db?q=80&w=400"}
+            {"n": "Torques de Ouro", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Torques_de_Burela.jpg/800px-Torques_de_Burela.jpg"},
+            {"n": "Machado de Ferro", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Iron_Axe_Head.JPG/600px-Iron_Axe_Head.JPG"}
         ],
         "animais": [
-            {"n": "Boi Barrosão", "uso": "Trabalho Pesado", "img": "https://images.unsplash.com/photo-1545468843-2796674f1df2?q=80&w=400"},
-            {"n": "Porco Bísaro", "uso": "Alimentação (Enchidos)", "img": "https://images.unsplash.com/photo-1594145070112-7096e79201f9?q=80&w=400"},
-            {"n": "Cão Galgo", "uso": "Caça de Lebres", "img": "https://images.unsplash.com/photo-1554692931-90a604297123?q=80&w=400"},
-            {"n": "Galinha Pedrês", "uso": "Ovos", "img": "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?q=80&w=400"}
+            {"n": "Vaca Cachena", "uso": "Tração e Leite", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Cachena_cow.jpg/800px-Cachena_cow.jpg"},
+            {"n": "Cão Castro Laboreiro", "uso": "Guarda", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Castro_Laboreiro_Dog_C%C3%A3o_de_Castro_Laboreiro.jpg/800px-Castro_Laboreiro_Dog_C%C3%A3o_de_Castro_Laboreiro.jpg"}
         ]
     },
-    "Conios (Sul)": {
-        "coords": [37.2, -8.1],
-        "historia": "O povo mais antigo com escrita própria na Península, influenciado pelos Fenícios.",
+    "Conios (Escrita do Sudoeste)": {
+        "coords": [37.3, -8.1],
         "ferramentas": [
-            {"n": "Estela de Escrita", "desc": "Pedra gravada com alfabeto paleo-hispânico.", "img": "https://images.unsplash.com/photo-1518153925617-3a629474bc9b?q=80&w=400"},
-            {"n": "Ânfora de Barro", "desc": "Armazenamento de azeite e vinho.", "img": "https://images.unsplash.com/photo-1578507065211-1c4e99a5fd24?q=80&w=400"},
-            {"n": "Anzol de Bronze", "desc": "Pesca costeira avançada.", "img": "https://images.unsplash.com/photo-1516937941344-00b4e0337589?q=80&w=400"},
-            {"n": "Rede de Linho", "desc": "Pesca de cerco no mar.", "img": "https://images.unsplash.com/photo-1501703979959-79396f212591?q=80&w=400"}
+            {"n": "Estela de Escrita", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Escrita_do_Sudoeste_Estela_da_Abobada.jpg/400px-Escrita_do_Sudoeste_Estela_da_Abobada.jpg"},
+            {"n": "Ânfora de Barro", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Anfora_romana.jpg/400px-Anfora_romana.jpg"}
         ],
         "animais": [
-            {"n": "Burro do Algarve", "uso": "Carga de Mercadorias", "img": "https://images.unsplash.com/photo-1534145557161-469b768e987c?q=80&w=400"},
-            {"n": "Gado Vacum", "uso": "Carne e Leite", "img": "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?q=80&w=400"},
-            {"n": "Cão de Água", "uso": "Auxílio na Pesca", "img": "https://images.unsplash.com/photo-1598133894008-61f7fdb8cc3a?q=80&w=400"},
-            {"n": "Aves de Capoeira", "uso": "Subsistência", "img": "https://images.unsplash.com/photo-1516467508483-a7212febe31a?q=80&w=400"}
+            {"n": "Burro Mirandês", "uso": "Carga", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Burro_Mirand%C3%AAs.jpg/800px-Burro_Mirand%C3%AAs.jpg"}
         ]
     }
 }
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.title("🏛️ MundoVivo")
-    st.markdown("---")
-    with st.expander("▶ EXPLORAR POVOS"):
-        selecao = st.radio("", list(povos_db.keys()))
+    st.title("🏛️ MENU")
+    with st.expander("▶ ESCOLHER POVO"):
+        selecao = st.radio("", list(povos.keys()))
 
-povo = povos_db[selecao]
+povo = povos[selecao]
 
-# --- TOPO: MAPA E INFO ---
-st.title(f"Povo Antigo: {selecao}")
-st.markdown(f"> {povo['historia']}")
-
+# --- LAYOUT SUPERIOR: MAPA ---
+st.title(f"Povo: {selecao}")
 m = folium.Map(location=[39.5, -8.0], zoom_start=6, tiles="CartoDB dark_matter")
-folium.Marker(povo["coords"], popup=selecao, icon=folium.Icon(color='red', icon='info-sign')).add_to(m)
-st_folium(m, width="100%", height=300)
+folium.Marker(povo["coords"], popup=selecao).add_to(m)
+st_folium(m, width="100%", height=350)
 
-# --- LISTA HORIZONTAL DE FERRAMENTAS ---
-st.markdown("<div class='section-header'>🛠️ Ferramentas e Tecnologia</div>", unsafe_allow_html=True)
-cols_f = st.columns(len(povo["ferramentas"]))
+# --- LAYOUT INFERIOR: LISTAS HORIZONTAIS REALISTAS ---
+
+# 1. FERRAMENTAS REAIS
+st.markdown("<h3 class='section-title'>⚒️ Ferramentas (Achados Arqueológicos)</h3>", unsafe_allow_html=True)
+cols_f = st.columns(4)
 for i, f in enumerate(povo["ferramentas"]):
-    with cols_f[i]:
+    with cols_f[i % 4]:
         st.markdown(f"""
             <div class="cc-card">
-                <img src="{f['img']}" class="img-box">
-                <div class="label">OBJETO</div>
+                <img src="{f['img']}" class="img-real">
+                <div class="label">ARTEFACTO</div>
                 <div class="value">{f['n']}</div>
-                <div class="desc-text">{f['desc']}</div>
             </div>
         """, unsafe_allow_html=True)
 
-# --- LISTA HORIZONTAL DE ANIMAIS (CARTÃO DE CIDADÃO) ---
-st.markdown("<div class='section-header'>🪪 Animais da Quinta (Cartão de Cidadão)</div>", unsafe_allow_html=True)
-cols_a = st.columns(len(povo["animais"]))
+# 2. ANIMAIS REAIS (CARTÃO DE CIDADÃO)
+st.markdown("<h3 class='section-title'>🪪 Cartão de Cidadão Animal (Raças Reais)</h3>", unsafe_allow_html=True)
+cols_a = st.columns(4)
 for i, a in enumerate(povo["animais"]):
-    with cols_a[i]:
+    with cols_a[i % 4]:
         st.markdown(f"""
             <div class="cc-card">
-                <div class="cc-title">CARTÃO DE CIDADÃO ANIMAL</div>
-                <img src="{a['img']}" class="img-box">
-                <div class="label">NOME</div>
+                <div class="cc-header">REPÚBLICA POVOS ANTIGOS</div>
+                <img src="{a['img']}" class="img-real">
+                <div class="label">ESPÉCIE/RAÇA</div>
                 <div class="value">{a['n']}</div>
-                <div class="label">FUNÇÃO / UTILIZAÇÃO</div>
+                <div class="label">OCUPAÇÃO</div>
                 <div class="value">{a['uso']}</div>
             </div>
         """, unsafe_allow_html=True)
-
-st.divider()
-st.caption("Dados históricos baseados em achados arqueológicos da Península Ibérica.")
