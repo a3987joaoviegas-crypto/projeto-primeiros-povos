@@ -2,17 +2,17 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 
-st.set_page_config(page_title="Mundovivo: História de Portugal", layout="wide")
+st.set_page_config(page_title="Mundovivo: Portugal", layout="wide")
 
-# Inicialização de Favoritos
+# Inicializar Favoritos
 if 'minhas_tribos' not in st.session_state:
     st.session_state.minhas_tribos = []
 
-# CSS Estilo Mundovivo - Total Black
+# CSS Mundovivo Total Black
 st.markdown("""
     <style>
     .stApp { background-color: #000000; color: white; }
-    .section-title { color: white; border-left: 4px solid #ffffff; padding-left: 15px; margin: 30px 0 10px 0; font-size: 1.2rem; }
+    .section-title { color: white; border-left: 4px solid #ffffff; padding-left: 15px; margin: 30px 0 15px 0; font-size: 1.2rem; }
     .cc-card { background-color: #111111; color: #ffffff; border: 1px solid #333; border-radius: 12px; padding: 15px; text-align: center; height: 100%; }
     .img-box { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; border: 1px solid #444; }
     .label { color: #888; font-size: 0.6rem; text-transform: uppercase; margin-top: 5px; }
@@ -24,99 +24,60 @@ st.markdown("""
 # --- DATABASE COMPLETA (7 ÉPOCAS) ---
 db = {
     "1. Pré-História": {
-        "coord": [38.5, -8.0], "info": "Megalitismo e Caçadores-recoletores.",
+        "coord": [38.5, -8.0], "info": "Megalitismo e Caçadores.",
         "ferramentas": [
-            {"n": "Biface", "f": "Corte de carne", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Biface_de_Saint-Acheul.jpg/400px-Biface_de_Saint-Acheul.jpg"},
-            {"n": "Arco", "f": "Caça à distância", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Two_reconstructed_Neolithic_bows.jpg/400px-Two_reconstructed_Neolithic_bows.jpg"},
-            {"n": "Ponta Silex", "f": "Perfurar peles", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Solutrean_point.jpg/400px-Solutrean_point.jpg"},
-            {"n": "Vaso Barro", "f": "Armazenar grãos", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Vaso_campaniforme_de_Ciempozuelos_%28M.A.N.1922-21-2%29_01.jpg/400px-Vaso_campaniforme_de_Ciempozuelos_%28M.A.N.1922-21-2%29_01.jpg"}
+            {"n": "Biface", "f": "Corte", "img": "https://images.unsplash.com/photo-1510414695470-24970f807365?w=400"},
+            {"n": "Arco", "f": "Caça", "img": "https://images.unsplash.com/photo-1511406361295-0a5ff814c0ad?w=400"},
+            {"n": "Silex", "f": "Perfurar", "img": "https://images.unsplash.com/photo-1619678595438-66037d4560e2?w=400"},
+            {"n": "Vaso", "f": "Cozinha", "img": "https://images.unsplash.com/photo-1578507065211-1c4e99a5fd24?w=400"}
         ],
         "animais": [
-            {"n": "Lobo Ibérico", "f": "Predador topo", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Canis_lupus_265b.jpg/400px-Canis_lupus_265b.jpg"},
-            {"n": "Cervo", "f": "Fonte de carne", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Red_Deer_03.jpg/400px-Red_Deer_03.jpg"},
-            {"n": "Javali", "f": "Caça perigosa", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Wild_Boar_Hampshire.jpg/400px-Wild_Boar_Hampshire.jpg"},
-            {"n": "Auroque", "f": "Touro ancestral", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Aurochs_heck_cattle.jpg/400px-Aurochs_heck_cattle.jpg"}
+            {"n": "Lobo", "f": "Predador", "img": "https://images.unsplash.com/photo-1590424753042-32244f05563c?w=400"},
+            {"n": "Cervo", "f": "Alimento", "img": "https://images.unsplash.com/photo-1549194380-f3c6c795af0e?w=400"},
+            {"n": "Javali", "f": "Caça", "img": "https://images.unsplash.com/photo-1516248967355-90033c94d13c?w=400"},
+            {"n": "Boi", "f": "Força", "img": "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=400"}
         ]
     },
     "2. Lusitanos": {
         "coord": [40.3, -7.5], "info": "Guerreiros da Serra da Estrela.",
         "ferramentas": [
-            {"n": "Falcata", "f": "Espada de combate", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Falcata_01.JPG/400px-Falcata_01.JPG"},
-            {"n": "Caetra", "f": "Escudo de defesa", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/C%C3%A6tra.png/400px-C%C3%A6tra.png"},
-            {"n": "Lança", "f": "Ataque médio alcance", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Spear_tips.jpg/400px-Spear_tips.jpg"},
-            {"n": "Fuso", "f": "Tecer lã", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Fusaiolas_-_Guimaraes.jpg/400px-Fusaiolas_-_Guimaraes.jpg"}
+            {"n": "Falcata", "f": "Guerra", "img": "https://images.unsplash.com/photo-1590256153835-bd3c4014292c?w=400"},
+            {"n": "Escudo", "f": "Defesa", "img": "https://images.unsplash.com/photo-1615678815958-5d413b70b653?w=400"},
+            {"n": "Lança", "f": "Ataque", "img": "https://images.unsplash.com/photo-1558285511-966956795f55?w=400"},
+            {"n": "Tecelagem", "f": "Roupas", "img": "https://images.unsplash.com/photo-1615560113840-06900693f185?w=400"}
         ],
         "animais": [
-            {"n": "Cavalo Lusitano", "f": "Guerra", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Lusitano_horse_grazing.jpg/400px-Lusitano_horse_grazing.jpg"},
-            {"n": "Porco Alentejano", "f": "Sustento", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Black_Iberian_Pig.jpg/400px-Black_Iberian_Pig.jpg"},
-            {"n": "Ovelha", "f": "Lã", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Bordaleira_Serra_da_Estrela.jpg/400px-Bordaleira_Serra_da_Estrela.jpg"},
-            {"n": "Mastim", "f": "Guarda de castros", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Gentle_Giant_English_Mastiff.jpg/400px-Gentle_Giant_English_Mastiff.jpg"}
+            {"n": "Cavalo", "f": "Montaria", "img": "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=400"},
+            {"n": "Porco", "f": "Carne", "img": "https://images.unsplash.com/photo-1594145070112-7096e79201f9?w=400"},
+            {"n": "Ovelha", "f": "Lã", "img": "https://images.unsplash.com/photo-1484557985045-edf25e08da73?w=400"},
+            {"n": "Cão", "f": "Guarda", "img": "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400"}
         ]
     },
     "3. Conios": {
-        "coord": [37.1, -8.2], "info": "Escrita do Sudoeste.",
-        "ferramentas": [{"n": "Estela", "f": "Escrita", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Escrita_do_Sudoeste_-_Almodovar.jpg/400px-Escrita_do_Sudoeste_-_Almodovar.jpg"}, {"n": "Anzol", "f": "Pesca", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Hooks_prehistoric.jpg/400px-Hooks_prehistoric.jpg"}, {"n": "Ânfora", "f": "Comércio", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Anfora_romana_BA.jpg/400px-Anfora_romana_BA.jpg"}, {"n": "Rede", "f": "Pesca", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Fishing_net.jpg/400px-Fishing_net.jpg"}],
-        "animais": [{"n": "Burro", "f": "Carga", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Donkey_1_arp_750px.jpg/400px-Donkey_1_arp_750px.jpg"}, {"n": "Cão Água", "f": "Pesca", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Portuguese_Water_Dog_2.jpg/400px-Portuguese_Water_Dog_2.jpg"}, {"n": "Abelha", "f": "Mel", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Apis_mellifera_flying.jpg/400px-Apis_mellifera_flying.jpg"}, {"n": "Galinha", "f": "Ovos", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Free_range_hens.jpg/400px-Free_range_hens.jpg"}]
+        "coord": [37.1, -8.2], "info": "Povo da Escrita do Sul.",
+        "ferramentas": [
+            {"n": "Estela", "f": "Escrita", "img": "https://images.unsplash.com/photo-1515542641795-85ed3b3b4297?w=400"},
+            {"n": "Rede", "f": "Pesca", "img": "https://images.unsplash.com/photo-1501703979959-79396f212591?w=400"},
+            {"n": "Anzol", "f": "Pesca", "img": "https://images.unsplash.com/photo-1516937941344-00b4e0337589?w=400"},
+            {"n": "Ânfora", "f": "Azeite", "img": "https://images.unsplash.com/photo-1578507065211-1c4e99a5fd24?w=400"}
+        ],
+        "animais": [
+            {"n": "Burro", "f": "Carga", "img": "https://images.unsplash.com/photo-1534145557161-469b768e987c?w=400"},
+            {"n": "Cão Água", "f": "Pesca", "img": "https://images.unsplash.com/photo-1598133894008-61f7fdb8cc3a?w=400"},
+            {"n": "Galinha", "f": "Ovos", "img": "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=400"},
+            {"n": "Abelha", "f": "Mel", "img": "https://images.unsplash.com/photo-1581404476143-fb31d742929f?w=400"}
+        ]
     },
     "4. Romanos": {
         "coord": [38.4, -7.9], "info": "Império e Estradas.",
-        "ferramentas": [{"n": "Gladius", "f": "Guerra", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Gladius_Mainz.jpg/400px-Gladius_Mainz.jpg"}, {"n": "Mosaico", "f": "Arte", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Mosaico_Conimbriga.jpg/400px-Mosaico_Conimbriga.jpg"}, {"n": "Moeda", "f": "Troca", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Roman_coins.jpg/400px-Roman_coins.jpg"}, {"n": "Groma", "f": "Estradas", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Groma.JPG/400px-Groma.JPG"}],
-        "animais": [{"n": "Boi", "f": "Arado", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Common_ox.jpg/400px-Common_ox.jpg"}, {"n": "Mula", "f": "Transporte", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Mule_in_the_grand_canyon.jpg/400px-Mule_in_the_grand_canyon.jpg"}, {"n": "Ganso", "f": "Guarda", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Domestic_Goose.jpg/400px-Domestic_Goose.jpg"}, {"n": "Cavalo", "f": "Correio", "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Roman_Cavalry.jpg/400px-Roman_Cavalry.jpg"}]
-    }
-    # Outras épocas (Visigodos, Árabes, Descobrimentos) podem ser adicionadas com a mesma lógica.
-}
-
-# --- SIDEBAR COM LINHA TEMPORAL ---
-with st.sidebar:
-    st.title("🏛️ MENU")
-    modo = st.radio("SELECIONAR MODO:", ["Explorar Épocas", "Linha do Tempo (Slider)", "⭐ Minhas Tribos"])
-    
-    if modo == "Explorar Épocas":
-        item = st.selectbox("POVO:", list(db.keys()))
-    elif modo == "Linha do Tempo (Slider)":
-        item = st.select_slider("PASSE O TEMPO:", options=list(db.keys()))
-    else:
-        item = None
-
-# --- CONTEÚDO ---
-if modo == "⭐ Minhas Tribos":
-    st.title("As Minhas Tribos")
-    if not st.session_state.minhas_tribos:
-        st.info("Nenhuma tribo favorita.")
-    else:
-        for t in st.session_state.minhas_tribos:
-            st.markdown(f"<div class='info-box'>🛡️ Tribo Guardada: <b>{t}</b></div>", unsafe_allow_html=True)
-else:
-    dados = db[item]
-    st.title(item)
-    if st.button(f"➕ Entrar na Tribo {item}"):
-        if item not in st.session_state.minhas_tribos:
-            st.session_state.minhas_tribos.append(item)
-            st.rerun()
-
-    st.markdown(f'<div class="info-box">{dados["info"]}</div>', unsafe_allow_html=True)
-    m = folium.Map(location=dados["coord"], zoom_start=7, tiles="CartoDB dark_matter")
-    folium.Marker(dados["coord"], icon=folium.Icon(color="red")).add_to(m)
-    st_folium(m, width="100%", height=300)
-
-    # Ferramentas
-    st.markdown("<h3 class='section-title'>⚒️ Ferramentas</h3>", unsafe_allow_html=True)
-    cf = st.columns(4)
-    for i, f in enumerate(dados["ferramentas"]):
-        with cf[i]:
-            st.markdown(f"""<div class="cc-card">
-                <img src="{f['img']}" class="img-box">
-                <div class="label">NOME</div><div class="value">{f['n']}</div>
-                <div class="label">FUNÇÃO</div><div class="value">{f['f']}</div>
-            </div>""", unsafe_allow_html=True)
-
-    # Animais
-    st.markdown("<h3 class='section-title'>🪪 Cartão Animal</h3>", unsafe_allow_html=True)
-    ca = st.columns(4)
-    for i, a in enumerate(dados["animais"]):
-        with ca[i]:
-            st.markdown(f"""<div class="cc-card">
-                <img src="{a['img']}" class="img-box">
-                <div class="label">NOME</div><div class="value">{a['n']}</div>
-                <div class="label">PAPEL</div><div class="value">{a['f']}</div>
-            </div>""", unsafe_allow_html=True)
+        "ferramentas": [{"n": "Gladius", "f": "Guerra", "img": "https://images.unsplash.com/photo-1590256153835-bd3c4014292c?w=400"}, {"n": "Moeda", "f": "Troca", "img": "https://images.unsplash.com/photo-1611085583191-a3b1a6a939db?w=400"}, {"n": "Mosaico", "f": "Arte", "img": "https://images.unsplash.com/photo-1576016770956-debb63d92058?w=400"}, {"n": "Groma", "f": "Medição", "img": "https://images.unsplash.com/photo-1503387762-592dea58ef21?w=400"}],
+        "animais": [{"n": "Boi", "f": "Arado", "img": "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=400"}, {"n": "Mula", "f": "Carga", "img": "https://images.unsplash.com/photo-1534145557161-469b768e987c?w=400"}, {"n": "Ganso", "f": "Guarda", "img": "https://images.unsplash.com/photo-1542316812-730623661600?w=400"}, {"n": "Cavalo", "f": "Correio", "img": "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=400"}]
+    },
+    "5. Visigodos": {
+        "coord": [38.1, -7.8], "info": "Reinos Germânicos.",
+        "ferramentas": [{"n": "Fíbula", "f": "Adorno", "img": "https://images.unsplash.com/photo-1611085583191-a3b1a6a939db?w=400"}, {"n": "Espada", "f": "Guerra", "img": "https://images.unsplash.com/photo-1590256153835-bd3c4014292c?w=400"}, {"n": "Cruz", "f": "Religião", "img": "https://images.unsplash.com/photo-1544427920-c49ccfb85579?w=400"}, {"n": "Escudo", "f": "Defesa", "img": "https://images.unsplash.com/photo-1615678815958-5d413b70b653?w=400"}],
+        "animais": [{"n": "Falcão", "f": "Caça", "img": "https://images.unsplash.com/photo-1506197072618-7ad5df6296df?w=400"}, {"n": "Cavalo", "f": "Montaria", "img": "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=400"}, {"n": "Cão", "f": "Caça", "img": "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400"}, {"n": "Cabra", "f": "Leite", "img": "https://images.unsplash.com/photo-1524024973431-2ad916746881?w=400"}]
+    },
+    "6. Árabes": {
+        "coord": [37.2, -7.9], "info": "Al-Andalus.",
+        "ferramentas": [{"n": "Astrolábio", "f": "Astros", "img": "https://images.unsplash.com/photo-1533134486753-c833f074868f?w=400"}, {"n": "Nora", "f": "Água", "img": "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=400"}, {"n": "Azulejo", "f": "Decoração", "img": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400"}, {"n": "Alaúde", "f": "Música", "img": "
