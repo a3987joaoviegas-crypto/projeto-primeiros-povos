@@ -2,143 +2,147 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 
-st.set_page_config(page_title="História de Portugal", layout="wide")
+st.set_page_config(page_title="Mundovivo: História de Portugal", layout="wide")
 
-# Inicializar favoritos de forma segura
+# Inicialização segura do estado
 if 'minhas_tribos' not in st.session_state:
     st.session_state.minhas_tribos = []
 
-# Estilo Visual Mundovivo - Total Black
+# CSS Estilo Mundovivo - Total Black
 st.markdown("""
     <style>
     .stApp { background-color: #000000; color: white; }
     .section-title { color: white; border-left: 4px solid #ffffff; padding-left: 15px; margin: 30px 0 15px 0; font-size: 1.2rem; }
-    .cc-card { background-color: #111111; color: #ffffff; border: 1px solid #333; border-radius: 12px; padding: 15px; text-align: center; height: 100%; }
-    .img-box { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; border: 1px solid #444; }
-    .label { color: #666; font-size: 0.6rem; text-transform: uppercase; margin-top: 5px; }
-    .value { font-size: 0.85rem; font-weight: bold; color: #fff; }
+    .cc-card { background-color: #111111; color: #ffffff; border: 1px solid #333; border-radius: 12px; padding: 15px; text-align: center; height: 100%; transition: 0.3s; }
+    .cc-card:hover { border-color: #fff; }
+    .img-box { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; border: 1px solid #444; background-color: #222; }
+    .label { color: #888; font-size: 0.6rem; text-transform: uppercase; margin-top: 5px; }
+    .value { font-size: 0.85rem; font-weight: bold; color: #fff; line-height: 1.2; }
     .info-box { background: #111111; padding: 20px; border-radius: 10px; border-top: 4px solid #ffffff; margin-bottom: 20px; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- DATABASE REAL COM FUNÇÕES E 7 ÉPOCAS ---
+# --- DATABASE COMPLETA COM 7 ÉPOCAS E FUNÇÕES ---
 db = {
     "1. Pré-História": {
-        "coord": [38.5, -8.0], "info": "Época das pedras e caça primitiva.",
+        "coord": [38.5, -8.0], "info": "Megalitismo e Caçadores-recoletores.",
         "ferramentas": [
-            {"n": "Biface", "f": "Corte de carne", "img": "https://loremflickr.com/400/300/stone,axe/all"},
-            {"n": "Arco", "f": "Caça à distância", "img": "https://loremflickr.com/400/300/bow,hunting/all"},
-            {"n": "Ponta Silex", "f": "Perfurar peles", "img": "https://loremflickr.com/400/300/arrowhead/all"},
-            {"n": "Raspador", "f": "Limpar peles", "img": "https://loremflickr.com/400/300/scraper,tool/all"}
+            {"n": "Biface", "f": "Corte e raspagem", "q": "paleolithic,tool"},
+            {"n": "Arco", "f": "Caça à distância", "q": "primitive,bow"},
+            {"n": "Ponta Silex", "f": "Perfurar peles", "q": "arrowhead"},
+            {"n": "Vaso Barro", "f": "Armazenar grãos", "q": "ancient,pottery"}
         ],
         "animais": [
-            {"n": "Lobo", "f": "Predador topo", "img": "https://loremflickr.com/400/300/wolf/all"},
-            {"n": "Cervo", "f": "Fonte de carne", "img": "https://loremflickr.com/400/300/deer/all"},
-            {"n": "Javali", "f": "Caça perigosa", "img": "https://loremflickr.com/400/300/wildboar/all"},
-            {"n": "Auroque", "f": "Touro selvagem", "img": "https://loremflickr.com/400/300/bull/all"}
+            {"n": "Lobo Ibérico", "f": "Competidor de caça", "q": "wolf"},
+            {"n": "Cervo", "f": "Fonte de alimento", "q": "deer"},
+            {"n": "Javali", "f": "Caça e rituais", "q": "wild,boar"},
+            {"n": "Auroque", "f": "Touro ancestral", "q": "bull"}
         ]
     },
     "2. Lusitanos": {
-        "coord": [40.3, -7.5], "info": "Guerreiros montanheses liderados por Viriato.",
+        "coord": [40.3, -7.5], "info": "Guerreiros da Serra da Estrela.",
         "ferramentas": [
-            {"n": "Falcata", "f": "Combate corpo a corpo", "img": "https://loremflickr.com/400/300/sword/all"},
-            {"n": "Caetra", "f": "Defesa ágil", "img": "https://loremflickr.com/400/300/shield/all"},
-            {"n": "Lança", "f": "Ataque médio alcance", "img": "https://loremflickr.com/400/300/spear/all"},
-            {"n": "Fuso", "f": "Fiar lã de ovelha", "img": "https://loremflickr.com/400/300/spinning,tool/all"}
+            {"n": "Falcata", "f": "Espada de combate", "q": "ancient,sword"},
+            {"n": "Caetra", "f": "Escudo de defesa", "q": "round,shield"},
+            {"n": "Lança", "f": "Ataque de médio alcance", "q": "spear"},
+            {"n": "Fuso", "f": "Fiação de lã", "q": "spinning,tool"}
         ],
         "animais": [
-            {"n": "Cavalo", "f": "Montaria de guerra", "img": "https://loremflickr.com/400/300/horse/all"},
-            {"n": "Porco", "f": "Sustento base", "img": "https://loremflickr.com/400/300/pig/all"},
-            {"n": "Ovelha", "f": "Produção de lã", "img": "https://loremflickr.com/400/300/sheep/all"},
-            {"n": "Cão Fila", "f": "Guarda de gado", "img": "https://loremflickr.com/400/300/mastiff/all"}
+            {"n": "Cavalo Lusitano", "f": "Montaria de guerra", "q": "horse"},
+            {"n": "Porco Alentejano", "f": "Sustento básico", "q": "pig"},
+            {"n": "Ovelha", "f": "Produção de lã", "q": "sheep"},
+            {"n": "Cão de Fila", "f": "Guarda de castros", "q": "mastiff"}
         ]
     },
     "3. Conios": {
-        "coord": [37.1, -8.2], "info": "Primeira escrita da Península no Sul.",
+        "coord": [37.1, -8.2], "info": "A enigmática escrita do Sul.",
         "ferramentas": [
-            {"n": "Estela", "f": "Gravar leis/nomes", "img": "https://loremflickr.com/400/300/stone,writing/all"},
-            {"n": "Anzol", "f": "Pesca costeira", "img": "https://loremflickr.com/400/300/fishhook/all"},
-            {"n": "Rede", "f": "Pesca em massa", "img": "https://loremflickr.com/400/300/fishingnet/all"},
-            {"n": "Ânfora", "f": "Guardar azeite", "img": "https://loremflickr.com/400/300/clay,pot/all"}
+            {"n": "Estela", "f": "Inscrição funerária", "q": "monolith"},
+            {"n": "Anzol de Bronze", "f": "Pesca costeira", "q": "fish,hook"},
+            {"n": "Rede", "f": "Pesca artesanal", "q": "fishing,net"},
+            {"n": "Ânfora", "f": "Transporte de vinho", "q": "amphora"}
         ],
         "animais": [
-            {"n": "Burro", "f": "Transporte de carga", "img": "https://loremflickr.com/400/300/donkey/all"},
-            {"n": "Cão Água", "f": "Ajuda aos pescadores", "img": "https://loremflickr.com/400/300/waterdog/all"},
-            {"n": "Galinha", "f": "Ovos e carne", "img": "https://loremflickr.com/400/300/chicken/all"},
-            {"n": "Abelha", "f": "Mel e cera", "img": "https://loremflickr.com/400/300/bee/all"}
+            {"n": "Burro", "f": "Carga e transporte", "q": "donkey"},
+            {"n": "Cão de Água", "f": "Auxílio na pesca", "q": "water,dog"},
+            {"n": "Galinha", "f": "Alimento doméstico", "q": "chicken"},
+            {"n": "Abelha", "f": "Produção de mel", "q": "bee"}
         ]
     },
     "4. Romanos": {
-        "coord": [38.4, -7.9], "info": "Império, Estradas e Direito.",
-        "ferramentas": [
-            {"n": "Gladius", "f": "Espada legada", "img": "https://loremflickr.com/400/300/gladius/all"},
-            {"n": "Groma", "f": "Medir estradas", "img": "https://loremflickr.com/400/300/surveying/all"},
-            {"n": "Mosaico", "f": "Decoração de vilas", "img": "https://loremflickr.com/400/300/mosaic/all"},
-            {"n": "Moeda", "f": "Comércio imperial", "img": "https://loremflickr.com/400/300/coin/all"}
-        ],
-        "animais": [
-            {"n": "Boi", "f": "Puxar o arado", "img": "https://loremflickr.com/400/300/oxen/all"},
-            {"n": "Mula", "f": "Carga pesada", "img": "https://loremflickr.com/400/300/mule/all"},
-            {"n": "Ganso", "f": "Vigilância", "img": "https://loremflickr.com/400/300/goose/all"},
-            {"n": "Cavalo", "f": "Correio rápido", "img": "https://loremflickr.com/400/300/riding,horse/all"}
-        ]
+        "coord": [38.4, -7.9], "info": "A civilização das estradas e pontes.",
+        "ferramentas": [{"n": "Gladius", "f": "Combate legada", "q": "gladius"}, {"n": "Groma", "f": "Alineação de vias", "q": "surveying"}, {"n": "Mosaico", "f": "Pavimento artístico", "q": "mosaic"}, {"n": "Moeda", "f": "Moeda de troca", "q": "roman,coin"}],
+        "animais": [{"n": "Boi", "f": "Arar os campos", "q": "ox"}, {"n": "Mula", "f": "Transporte imperial", "q": "mule"}, {"n": "Ganso", "u": "Sentinela", "q": "goose"}, {"n": "Cavalo", "f": "Cavalaria romana", "q": "roman,horse"}]
     },
     "5. Visigodos": {
-        "coord": [38.1, -7.8], "info": "Sucessores germânicos dos Romanos.",
-        "ferramentas": [{"n": "Fíbula", "f": "Prender mantos", "img": "https://loremflickr.com/400/300/brooch/all"}, {"n": "Espada", "f": "Combate", "img": "https://loremflickr.com/400/300/medieval,sword/all"}, {"n": "Cruz", "f": "Símbolo religioso", "img": "https://loremflickr.com/400/300/cross/all"}, {"n": "Escudo", "f": "Defesa", "img": "https://loremflickr.com/400/300/shield,wood/all"}],
-        "animais": [{"n": "Falcão", "f": "Caça desportiva", "img": "https://loremflickr.com/400/300/falcon/all"}, {"n": "Cavalo", "f": "Montaria nobre", "img": "https://loremflickr.com/400/300/horse/all"}, {"n": "Cão", "f": "Caça em matilha", "img": "https://loremflickr.com/400/300/hound/all"}, {"n": "Cabra", "f": "Leite e queijo", "img": "https://loremflickr.com/400/300/goat/all"}]
+        "coord": [38.1, -7.8], "info": "Reinos Bárbaros e Cristandade.",
+        "ferramentas": [{"n": "Fíbula", "f": "Adorno e fecho", "q": "brooch"}, {"n": "Espada Longa", "f": "Duelo germânico", "q": "medieval,sword"}, {"n": "Cruz", "f": "Símbolo de fé", "q": "cross"}, {"n": "Escudo", "f": "Proteção em muro", "q": "wood,shield"}],
+        "animais": [{"n": "Falcão", "f": "Falcoaria nobre", "q": "falcon"}, {"n": "Cavalo", "f": "Montaria de elite", "q": "stallion"}, {"n": "Ovelha", "f": "Vestuário de pele", "q": "sheep"}, {"n": "Cão", "f": "Caça maior", "q": "hound"}]
     },
     "6. Árabes": {
-        "coord": [37.2, -7.9], "info": "Mestres da agricultura e ciência.",
-        "ferramentas": [{"n": "Astrolábio", "f": "Navegação", "img": "https://loremflickr.com/400/300/astrolabe/all"}, {"n": "Nora", "f": "Elevação de água", "img": "https://loremflickr.com/400/300/waterwheel/all"}, {"n": "Enxada", "f": "Cuidar da horta", "img": "https://loremflickr.com/400/300/hoe/all"}, {"n": "Azulejo", "f": "Revestimento", "img": "https://loremflickr.com/400/300/tile/all"}],
-        "animais": [{"n": "Camelo", "f": "Carga no deserto", "img": "https://loremflickr.com/400/300/camel/all"}, {"n": "Gineto", "f": "Guerra rápida", "img": "https://loremflickr.com/400/300/arabian,horse/all"}, {"n": "Pomba", "f": "Mensagens", "img": "https://loremflickr.com/400/300/pigeon/all"}, {"n": "Gato", "f": "Controlo de pragas", "img": "https://loremflickr.com/400/300/cat/all"}]
+        "coord": [37.2, -7.9], "info": "Ciência e irrigação no Al-Andalus.",
+        "ferramentas": [{"n": "Astrolábio", "f": "Orientação astral", "q": "astrolabe"}, {"n": "Nora", "f": "Regadio agrícola", "q": "waterwheel"}, {"n": "Azulejo", "f": "Decoração geométrica", "q": "arabic,tile"}, {"n": "Alaúde", "f": "Poesia e música", "q": "lute"}],
+        "animais": [{"n": "Camelo", "f": "Carga de longa distância", "q": "camel"}, {"n": "Pomba", "f": "Correio aéreo", "q": "pigeon"}, {"n": "Gineto", "f": "Montaria ágil", "q": "horse,arab"}, {"n": "Cabra", "f": "Subsistência", "q": "goat"}]
     },
     "7. Descobrimentos": {
-        "coord": [38.7, -9.2], "info": "A era dos oceanos e caravelas.",
-        "ferramentas": [{"n": "Bússola", "f": "Orientação", "img": "https://loremflickr.com/400/300/compass/all"}, {"n": "Caravela", "f": "Navio de exploração", "img": "https://loremflickr.com/400/300/ship/all"}, {"n": "Astrolábio", "f": "Latitude", "img": "https://loremflickr.com/400/300/navigation/all"}, {"n": "Mapa", "f": "Cartografia", "img": "https://loremflickr.com/400/300/map/all"}],
-        "animais": [{"n": "Papagaio", "f": "Mascote exótica", "img": "https://loremflickr.com/400/300/parrot/all"}, {"n": "Macaco", "f": "Curiosidade", "img": "https://loremflickr.com/400/300/monkey/all"}, {"n": "Elefante", "f": "Presente real", "img": "https://loremflickr.com/400/300/elephant/all"}, {"n": "Cão Navio", "f": "Sentinela bordo", "img": "https://loremflickr.com/400/300/dog/all"}]
+        "coord": [38.7, -9.2], "info": "Navegação e Expansão Mundial.",
+        "ferramentas": [{"n": "Bússola", "f": "Rumo no mar", "q": "compass"}, {"n": "Caravela", "f": "Navio de exploração", "q": "caravel"}, {"n": "Quadrante", "f": "Medição de altura", "q": "quadrant"}, {"n": "Mapa", "f": "Traçado do mundo", "q": "old,map"}],
+        "animais": [{"n": "Papagaio", "f": "Exótico", "q": "parrot"}, {"n": "Macaco", "f": "Curiosidade", "q": "monkey"}, {"n": "Elefante", "f": "Poder real", "q": "elephant"}, {"n": "Cão Fila", "f": "Proteção de carga", "q": "dog"}]
     }
 }
 
-# --- SIDEBAR ---
+# --- SIDEBAR COM 5 APIS / MOTORES ---
 with st.sidebar:
-    st.title("🏛️ MENU")
+    st.title("🏛️ CONTROLO")
     modo = st.radio("SELECIONAR MODO:", ["Explorar", "Linha do Tempo", "⭐ Minhas Tribos"])
-    if modo == "Explorar":
-        item = st.selectbox("POVO:", list(db.keys()))
-    elif modo == "Linha do Tempo":
-        item = st.select_slider("TEMPO:", options=list(db.keys()))
+    
+    st.markdown("---")
+    st.subheader("⚙️ Motores de Imagem (APIs)")
+    api_source = st.selectbox("FONTE DE PESQUISA:", ["Unsplash API", "LoremFlickr API", "Picsum API", "Wikimedia Search", "PlaceImg API"])
+    
+    if modo != "⭐ Minhas Tribos":
+        item = st.selectbox("POVO:", list(db.keys())) if modo == "Explorar" else st.select_slider("TEMPO:", options=list(db.keys()))
     else:
         item = None
 
-# --- CONTEÚDO ---
+# --- LÓGICA DE IMAGEM (RODÍZIO DE APIs) ---
+def get_img(query, source):
+    if source == "Unsplash API": return f"https://source.unsplash.com/featured/400x300?{query}"
+    if source == "LoremFlickr API": return f"https://loremflickr.com/400/300/{query}/all"
+    if source == "Picsum API": return f"https://picsum.photos/400/300?random={query}"
+    if source == "Wikimedia Search": return f"https://commons.wikimedia.org/w/index.php?search={query}&title=Special:Search"
+    return f"https://placeimg.com/400/300/{query}"
+
+# --- CONTEÚDO PRINCIPAL ---
 if modo == "⭐ Minhas Tribos":
     st.title("As Minhas Tribos Favoritas")
     if not st.session_state.minhas_tribos:
-        st.warning("Não tens tribos favoritas! Vai a 'Explorar' e clica em 'Entrar na Tribo'.")
+        st.warning("Lista vazia. Entra numa tribo no modo Explorar!")
     else:
         for t in st.session_state.minhas_tribos:
-            st.markdown(f"<div class='info-box'>🛡️ És membro da tribo: <b>{t}</b></div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='info-box'>🛡️ Tribo Guardada: <b>{t}</b></div>", unsafe_allow_html=True)
 else:
     dados = db[item]
     st.title(item)
+    
     if st.button(f"➕ Entrar na Tribo {item}"):
         if item not in st.session_state.minhas_tribos:
             st.session_state.minhas_tribos.append(item)
-            st.success(f"Entraste na tribo {item}!")
+            st.rerun()
 
     st.markdown(f'<div class="info-box">{dados["info"]}</div>', unsafe_allow_html=True)
     m = folium.Map(location=dados["coord"], zoom_start=7, tiles="CartoDB dark_matter")
     folium.Marker(dados["coord"], icon=folium.Icon(color="red")).add_to(m)
     st_folium(m, width="100%", height=300)
 
-    # SECÇÕES COM 4 COLUNAS E FUNÇÕES
+    # SECÇÕES COM 4 COLUNAS
     st.markdown("<h3 class='section-title'>⚒️ Ferramentas</h3>", unsafe_allow_html=True)
     cf = st.columns(4)
     for i, f in enumerate(dados["ferramentas"]):
         with cf[i]:
+            img = get_img(f['q'], api_source)
             st.markdown(f"""<div class="cc-card">
-                <img src="{f['img']}" class="img-box">
+                <img src="{img}" class="img-box">
                 <div class="label">NOME</div><div class="value">{f['n']}</div>
                 <div class="label">FUNÇÃO</div><div class="value">{f['f']}</div>
             </div>""", unsafe_allow_html=True)
@@ -147,8 +151,9 @@ else:
     ca = st.columns(4)
     for i, a in enumerate(dados["animais"]):
         with ca[i]:
+            img_a = get_img(a['q'], api_source)
             st.markdown(f"""<div class="cc-card">
-                <img src="{a['img']}" class="img-box">
+                <img src="{img_a}" class="img-box">
                 <div class="label">NOME</div><div class="value">{a['n']}</div>
                 <div class="label">PAPEL</div><div class="value">{a['f']}</div>
             </div>""", unsafe_allow_html=True)
