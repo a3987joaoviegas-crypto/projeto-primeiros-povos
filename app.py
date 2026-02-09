@@ -1,6 +1,7 @@
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
+import random
 
 st.set_page_config(page_title="Primeiros Povos de Portugal", layout="wide")
 
@@ -21,38 +22,38 @@ st.markdown("""
 db = {
     "1. Pré-História": {
         "coord": [38.5, -8.0], "info": "Megalitismo e Caçadores.",
-        "ferramentas": [{"n": "Biface", "q": "prehistoric,stone"}, {"n": "Arco", "q": "primitive,bow"}, {"n": "Ponta Silex", "q": "arrowhead"}, {"n": "Vaso Barro", "q": "pottery,clay"}],
-        "animais": [{"n": "Lobo", "u": "Selvagem", "q": "wolf"}, {"n": "Auroque", "u": "Caça", "q": "bull"}, {"n": "Cervo", "u": "Alimento", "q": "deer"}, {"n": "Javali", "u": "Caça", "q": "boar"}]
+        "ferramentas": [{"n": "Biface", "q": "prehistoric-stone"}, {"n": "Arco", "q": "bow-arrow"}, {"n": "Ponta Silex", "q": "arrowhead"}, {"n": "Vaso Barro", "q": "pottery"}],
+        "animais": [{"n": "Lobo", "u": "Selvagem", "q": "wolf"}, {"n": "Auroque", "u": "Caça", "q": "bull"}, {"n": "Cervo", "u": "Alimento", "q": "deer"}, {"n": "Javali", "u": "Caça", "q": "wild-boar"}]
     },
     "2. Lusitanos": {
         "coord": [40.3, -7.5], "info": "Guerreiros da Serra da Estrela.",
-        "ferramentas": [{"n": "Falcata", "q": "ancient,sword"}, {"n": "Caetra", "q": "shield"}, {"n": "Lança", "q": "spear"}, {"n": "Fuso", "q": "weaving"}],
-        "animais": [{"n": "Cavalo", "u": "Guerra", "q": "horse"}, {"n": "Porco", "u": "Alimento", "q": "pig"}, {"n": "Ovelha", "u": "Lã", "q": "sheep"}, {"n": "Cão Fila", "u": "Guarda", "q": "dog"}]
+        "ferramentas": [{"n": "Falcata", "q": "ancient-sword"}, {"n": "Caetra", "q": "shield"}, {"n": "Lança", "q": "spear"}, {"n": "Fuso", "q": "wool"}],
+        "animais": [{"n": "Cavalo", "u": "Guerra", "q": "horse"}, {"n": "Porco", "u": "Alimento", "q": "pig"}, {"n": "Ovelha", "u": "Lã", "q": "sheep"}, {"n": "Cão Fila", "u": "Guarda", "q": "big-dog"}]
     },
     "3. Conios": {
         "coord": [37.1, -8.2], "info": "Povo da escrita do Sul.",
-        "ferramentas": [{"n": "Estela", "q": "monument,stone"}, {"n": "Anzol", "q": "fishing,hook"}, {"n": "Rede", "q": "fishing,net"}, {"n": "Ânfora", "q": "amphora"}],
-        "animais": [{"n": "Burro", "u": "Carga", "q": "donkey"}, {"n": "Cão Água", "u": "Pesca", "q": "dog,water"}, {"n": "Galinha", "u": "Ovos", "q": "chicken"}, {"n": "Abelha", "u": "Mel", "q": "bee"}]
+        "ferramentas": [{"n": "Estela", "q": "monument"}, {"n": "Anzol", "q": "fishing-hook"}, {"n": "Rede", "q": "fishing-net"}, {"n": "Ânfora", "q": "amphora"}],
+        "animais": [{"n": "Burro", "u": "Carga", "q": "donkey"}, {"n": "Cão Água", "u": "Pesca", "q": "water-dog"}, {"n": "Galinha", "u": "Ovos", "q": "chicken"}, {"n": "Abelha", "u": "Mel", "q": "bee"}]
     },
     "4. Romanos": {
         "coord": [38.4, -7.9], "info": "Civilização e Estradas.",
-        "ferramentas": [{"n": "Gladius", "q": "roman,sword"}, {"n": "Moeda", "q": "roman,coin"}, {"n": "Estilo", "q": "writing,ancient"}, {"n": "Groma", "q": "engineering"}],
-        "animais": [{"n": "Mula", "u": "Transporte", "q": "mule"}, {"n": "Boi", "u": "Arado", "q": "ox"}, {"n": "Ganso", "u": "Guarda", "q": "goose"}, {"n": "Cavalo", "u": "Correio", "q": "horse"}]
+        "ferramentas": [{"n": "Gladius", "q": "roman-sword"}, {"n": "Moeda", "q": "roman-coin"}, {"n": "Estilo", "q": "ancient-writing"}, {"n": "Groma", "q": "engineering"}],
+        "animais": [{"n": "Mula", "u": "Transporte", "q": "mule"}, {"n": "Boi", "u": "Arado", "q": "ox"}, {"n": "Ganso", "u": "Guarda", "q": "goose"}, {"n": "Cavalo", "u": "Correio", "q": "horse-riding"}]
     },
     "5. Visigodos": {
         "coord": [38.1, -7.8], "info": "Reinos Germânicos.",
-        "ferramentas": [{"n": "Fíbula", "q": "jewelry,ancient"}, {"n": "Espada Longa", "q": "medieval,sword"}, {"n": "Cruz", "q": "cross,ancient"}, {"n": "Escudo", "q": "warrior,shield"}],
-        "animais": [{"n": "Falcão", "u": "Caça", "q": "falcon"}, {"n": "Cavalo", "u": "Nobreza", "q": "stallion"}, {"n": "Cão", "u": "Caça", "q": "hound"}, {"n": "Ovelha", "u": "Pele", "q": "sheep"}]
+        "ferramentas": [{"n": "Fíbula", "q": "jewelry-ancient"}, {"n": "Espada Longa", "q": "medieval-sword"}, {"n": "Cruz", "q": "ancient-cross"}, {"n": "Escudo", "q": "warrior-shield"}],
+        "animais": [{"n": "Falcão", "u": "Caça", "q": "falcon"}, {"n": "Cavalo", "u": "Nobreza", "q": "stallion"}, {"n": "Cão", "u": "Caça", "q": "hound-dog"}, {"n": "Ovelha", "u": "Pele", "q": "sheep-wool"}]
     },
     "6. Árabes": {
         "coord": [37.2, -7.9], "info": "Al-Andalus e Ciência.",
-        "ferramentas": [{"n": "Nora", "q": "water,wheel"}, {"n": "Astrolábio", "q": "navigation,stars"}, {"n": "Azulejo", "q": "tile,arabic"}, {"n": "Alaúde", "q": "lute,instrument"}],
-        "animais": [{"n": "Camelo", "u": "Raro", "q": "camel"}, {"n": "Pomba", "u": "Mensagem", "q": "pigeon"}, {"n": "Gineto", "u": "Montaria", "q": "horse,desert"}, {"n": "Cabra", "u": "Leite", "q": "goat"}]
+        "ferramentas": [{"n": "Nora", "q": "water-well"}, {"n": "Astrolábio", "q": "astrolabe"}, {"n": "Azulejo", "q": "tile-pattern"}, {"n": "Alaúde", "q": "lute"}],
+        "animais": [{"n": "Camelo", "u": "Raro", "q": "camel"}, {"n": "Pomba", "u": "Mensagem", "q": "pigeon"}, {"n": "Gineto", "u": "Montaria", "q": "horse-arabian"}, {"n": "Cabra", "u": "Leite", "q": "goat"}]
     },
     "7. Descobrimentos": {
         "coord": [38.7, -9.2], "info": "Expansão Marítima.",
-        "ferramentas": [{"n": "Bússola", "q": "compass,old"}, {"n": "Quadrante", "q": "navigation"}, {"n": "Caravela", "q": "ship,sailing"}, {"n": "Mapa", "q": "old,map"}],
-        "animais": [{"n": "Papagaio", "u": "Exótico", "q": "parrot"}, {"n": "Macaco", "u": "Curiosidade", "q": "monkey"}, {"n": "Elefante", "u": "Presente", "q": "elephant"}, {"n": "Cão Fila", "u": "Navio", "q": "dog"}]
+        "ferramentas": [{"n": "Bússola", "q": "compass-old"}, {"n": "Quadrante", "q": "navigation-tool"}, {"n": "Caravela", "q": "sailing-ship"}, {"n": "Mapa", "q": "ancient-map"}],
+        "animais": [{"n": "Papagaio", "u": "Exótico", "q": "parrot"}, {"n": "Macaco", "u": "Curiosidade", "q": "monkey"}, {"n": "Elefante", "u": "Presente", "q": "elephant"}, {"n": "Cão Fila", "u": "Navio", "q": "mastiff"}]
     }
 }
 
@@ -81,13 +82,13 @@ st.markdown("<h3 class='section-title'>⚒️ Ferramentas</h3>", unsafe_allow_ht
 cols_f = st.columns(4)
 for i, f in enumerate(dados["ferramentas"]):
     with cols_f[i]:
-        img_url = f"https://source.unsplash.com/featured/400x300?{f['q']}"
-        st.markdown(f'<div class="cc-card"><img src="{img_url}" class="img-box"><div class="label">ARTEFACTO</div><div class="value">{f["n"]}</div></div>', unsafe_allow_html=True)
+        # URL com semente aleatória para evitar cache/bloqueio
+        img_url = f"https://images.unsplash.com/photo-1?auto=format&fit=crop&w=400&q=80&sig={random.randint(1,1000)}&keyword={f['q']}"
+        st.markdown(f'<div class="cc-card"><img src="https://images.unsplash.com/featured/?{f["q"]}" class="img-box"><div class="label">ARTEFACTO</div><div class="value">{f["n"]}</div></div>', unsafe_allow_html=True)
 
 # Animais
 st.markdown("<h3 class='section-title'>🪪 Cartão Animal</h3>", unsafe_allow_html=True)
 cols_a = st.columns(4)
 for i, a in enumerate(dados["animais"]):
     with cols_a[i]:
-        img_url_a = f"https://source.unsplash.com/featured/400x300?{a['q']}"
-        st.markdown(f'<div class="cc-card"><img src="{img_url_a}" class="img-box"><div class="label">NOME</div><div class="value">{a["n"]}</div><div class="label">USO</div><div class="value">{a["u"]}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="cc-card"><img src="https://images.unsplash.com/featured/?{a["q"]}" class="img-box"><div class="label">NOME</div><div class="value">{a["n"]}</div><div class="label">USO</div><div class="value">{a["u"]}</div></div>', unsafe_allow_html=True)
