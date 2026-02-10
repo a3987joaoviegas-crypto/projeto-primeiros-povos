@@ -169,7 +169,7 @@ else:
         with cf[i]:
             # API DINÂMICA DO UNSPLASH POR KEYWORD
             img_url = f"https://source.unsplash.com/featured/400x300?{f['kw']}"
-            set.markdown(f"""<div class="cc-card">
+            st.markdown(f"""<div class="cc-card">)
                 <img src="{img_url}" class="img-box">
                 <div class="label">NOME</div><div class="value">{f['n']}</div>
                 <div class="label">FUNÇÃO</div><div class="value">{f['f']}</div>
