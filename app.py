@@ -80,4 +80,58 @@ db = {
     },
     "6. Árabes": {
         "coord": [37.2, -7.9], "info": "Al-Andalus.",
-        "ferramentas": [{"n": "Astrolábio", "f": "Astros", "img": "https://images.unsplash.com/photo-1533134486753-c833f074868f?w=400"}, {"n": "Nora", "f": "Água", "img": "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=400"}, {"n": "Azulejo", "f": "Decoração", "img": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400"}, {"n": "Alaúde", "f": "Música", "img": "
+        "ferramentas": [{"n": "Astrolábio", "f": "Astros", "img": "https://images.unsplash.com/photo-1533134486753-c833f074868f?w=400"}, {"n": "Nora", "f": "Água", "img": "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=400"}, {"n": "Azulejo", "f": "Decoração", "img": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400"}, {"n": "Alaúde", "f": "Música", "img": "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=400"}],
+        "animais": [{"n": "Camelo", "f": "Carga", "img": "https://images.unsplash.com/photo-1551029506-0807df4e2031?w=400"}, {"n": "Cavalo", "f": "Guerra", "img": "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=400"}, {"n": "Pomba", "f": "Mensagem", "img": "https://images.unsplash.com/photo-1501901664534-534a42840673?w=400"}, {"n": "Gato", "f": "Pragas", "img": "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400"}]
+    },
+    "7. Descobrimentos": {
+        "coord": [38.7, -9.2], "info": "Mar e Glória.",
+        "ferramentas": [{"n": "Bússola", "f": "Rumo", "img": "https://images.unsplash.com/photo-1533630660533-0309e2518f83?w=400"}, {"n": "Caravela", "f": "Mar", "img": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400"}, {"n": "Mapa", "f": "Terra", "img": "https://images.unsplash.com/photo-1521295121783-8a321d551ad2?w=400"}, {"n": "Telescópio", "f": "Visão", "img": "https://images.unsplash.com/photo-1452723312111-3a7d0db0e024?w=400"}],
+        "animais": [{"n": "Papagaio", "f": "Exótico", "img": "https://images.unsplash.com/photo-1552728089-57bdde30fc3a?w=400"}, {"n": "Macaco", "f": "Exótico", "img": "https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?w=400"}, {"n": "Elefante", "f": "Rei", "img": "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?w=400"}, {"n": "Cão Navio", "f": "Sentinela", "img": "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400"}]
+    }
+}
+
+# --- SIDEBAR ---
+with st.sidebar:
+    st.title("🏛️ MENU")
+    modo = st.radio("MODO:", ["Explorar", "Linha do Tempo (Slider)", "⭐ Minhas Tribos"])
+    if modo == "Explorar":
+        item = st.selectbox("POVO:", list(db.keys()))
+    elif modo == "Linha do Tempo (Slider)":
+        item = st.select_slider("PASSE O TEMPO:", options=list(db.keys()))
+    else:
+        item = None
+
+# --- LÓGICA ---
+if modo == "⭐ Minhas Tribos":
+    st.title("Minhas Tribos Favoritas")
+    if not st.session_state.minhas_tribos:
+        st.warning("Adiciona tribos no modo Explorar!")
+    else:
+        for t in st.session_state.minhas_tribos:
+            st.markdown(f"<div class='info-box'>🛡️ <b>{t}</b></div>", unsafe_allow_html=True)
+else:
+    dados = db[item]
+    st.title(item)
+    if st.button(f"➕ Entrar na Tribo {item}"):
+        if item not in st.session_state.minhas_tribos:
+            st.session_state.minhas_tribos.append(item)
+            st.rerun()
+
+    st.markdown(f'<div class="info-box">{dados["info"]}</div>', unsafe_allow_html=True)
+    m = folium.Map(location=dados["coord"], zoom_start=7, tiles="CartoDB dark_matter")
+    folium.Marker(dados["coord"], icon=folium.Icon(color="red")).add_to(m)
+    st_folium(m, width="100%", height=300)
+
+    # Ferramentas
+    st.markdown("<h3 class='section-title'>⚒️ Ferramentas</h3>", unsafe_allow_html=True)
+    cf = st.columns(4)
+    for i, f in enumerate(dados["ferramentas"]):
+        with cf[i]:
+            st.markdown(f'<div class="cc-card"><img src="{f["img"]}" class="img-box"><div class="label">NOME</div><div class="value">{f["n"]}</div><div class="label">FUNÇÃO</div><div class="value">{f["f"]}</div></div>', unsafe_allow_html=True)
+
+    # Animais
+    st.markdown("<h3 class='section-title'>🪪 Cartão Animal</h3>", unsafe_allow_html=True)
+    ca = st.columns(4)
+    for i, a in enumerate(dados["animais"]):
+        with ca[i]:
+            st.markdown(f'<div class="cc-card"><img src="{a["img"]}" class="img-box"><div class="label">NOME</div><div class="value">{a["n"]}</div><div class="label">PAPEL</div><div class="value">{a["f"]}</div></div>', unsafe_allow_html=True)
