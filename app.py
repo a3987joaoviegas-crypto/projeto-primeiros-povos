@@ -8,7 +8,7 @@ st.set_page_config(page_title="Mundovivo: Portugal", layout="wide")
 if 'minhas_tribos' not in st.session_state:
     st.session_state.minhas_tribos = []
 
-# Estilo Mundovivo
+# CSS Estilo Mundovivo - Total Black
 st.markdown("""
     <style>
     .stApp { background-color: #000000; color: white; }
@@ -21,156 +21,111 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- DATABASE COM PALAVRAS-CHAVE PARA API ---
+# --- DATABASE COMPLETA (7 ÉPOCAS) ---
 db = {
     "1. Pré-História": {
-        "coord": [38.5, -8.0], "info": "Megalitismo e Caçadores.",
+        "coord": [38.5, -8.0], "info": "Megalitismo e Caçadores-recoletores.",
         "ferramentas": [
-            {"n": "Biface", "f": "Corte de carne", "kw": "stone-tool"},
-            {"n": "Arco", "f": "Caça", "kw": "bow-arrow"},
-            {"n": "Silex", "f": "Perfurar", "kw": "flint-stone"},
-            {"n": "Vaso", "f": "Cozinha", "kw": "prehistoric-pottery"}
+            {"n": "Biface", "f": "Corte de carne", "img": "https://images.unsplash.com/photo-1510414695470-24970f807365?w=400"},
+            {"n": "Arco", "f": "Caça à distância", "img": "https://images.unsplash.com/photo-1511406361295-0a5ff814c0ad?w=400"},
+            {"n": "Ponta Silex", "f": "Perfurar peles", "img": "https://images.unsplash.com/photo-1619678595438-66037d4560e2?w=400"},
+            {"n": "Vaso", "f": "Cozinha", "img": "https://images.unsplash.com/photo-1578507065211-1c4e99a5fd24?w=400"}
         ],
         "animais": [
-            {"n": "Lobo", "f": "Predador", "kw": "wolf"},
-            {"n": "Cervo", "f": "Alimento", "kw": "deer"},
-            {"n": "Javali", "f": "Caça", "kw": "wild-boar"},
-            {"n": "Boi", "f": "Força", "kw": "ox"}
+            {"n": "Lobo", "f": "Predador topo", "img": "https://images.unsplash.com/photo-1590424753042-32244f05563c?w=400"},
+            {"n": "Cervo", "f": "Fonte de carne", "img": "https://images.unsplash.com/photo-1549194380-f3c6c795af0e?w=400"},
+            {"n": "Javali", "f": "Caça e rituais", "img": "https://images.unsplash.com/photo-1516248967355-90033c94d13c?w=400"},
+            {"n": "Boi", "f": "Força ancestral", "img": "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=400"}
         ]
     },
     "2. Lusitanos": {
-        "coord": [40.3, -7.5], "info": "Guerreiros da Serra da Estrela.",
+        "coord": [40.3, -7.5], "info": "Guerreiros liderados por Viriato.",
         "ferramentas": [
-            {"n": "Falcata", "f": "Guerra", "kw": "ancient-sword"},
-            {"n": "Escudo", "f": "Defesa", "kw": "round-shield"},
-            {"n": "Lança", "f": "Ataque", "kw": "spear"},
-            {"n": "Fuso", "f": "Roupas", "kw": "weaving-loom"}
+            {"n": "Falcata", "f": "Espada curva", "img": "https://images.unsplash.com/photo-1590256153835-bd3c4014292c?w=400"},
+            {"n": "Caetra", "f": "Escudo redondo", "img": "https://images.unsplash.com/photo-1615678815958-5d413b70b653?w=400"},
+            {"n": "Lança", "f": "Ataque", "img": "https://images.unsplash.com/photo-1558285511-966956795f55?w=400"},
+            {"n": "Fuso", "f": "Tecelagem", "img": "https://images.unsplash.com/photo-1615560113840-06900693f185?w=400"}
         ],
         "animais": [
-            {"n": "Cavalo", "f": "Montaria", "kw": "iberian-horse"},
-            {"n": "Porco", "f": "Carne", "kw": "iberian-pig"},
-            {"n": "Ovelha", "f": "Lã", "kw": "sheep"},
-            {"n": "Mastim", "f": "Guarda", "kw": "mastiff-dog"}
+            {"n": "Cavalo", "f": "Guerra", "img": "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=400"},
+            {"n": "Porco", "f": "Sustento", "img": "https://images.unsplash.com/photo-1594145070112-7096e79201f9?w=400"},
+            {"n": "Ovelha", "f": "Lã", "img": "https://images.unsplash.com/photo-1484557985045-edf25e08da73?w=400"},
+            {"n": "Mastim", "f": "Guarda", "img": "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400"}
         ]
     },
     "3. Conios": {
         "coord": [37.1, -8.2], "info": "Povo da Escrita do Sul.",
-        "ferramentas": [
-            {"n": "Estela", "f": "Escrita", "kw": "ancient-stone-inscription"},
-            {"n": "Rede", "f": "Pesca", "kw": "fishing-net"},
-            {"n": "Anzol", "f": "Pesca", "kw": "fish-hook"},
-            {"n": "Ânfora", "f": "Azeite", "kw": "amphora"}
-        ],
-        "animais": [
-            {"n": "Burro", "f": "Carga", "kw": "donkey"},
-            {"n": "Cão Água", "f": "Pesca", "kw": "water-dog"},
-            {"n": "Galinha", "f": "Ovos", "kw": "chicken"},
-            {"n": "Abelha", "f": "Mel", "kw": "bee"}
-        ]
+        "ferramentas": [{"n": "Estela", "f": "Escrita", "img": "https://images.unsplash.com/photo-1515542641795-85ed3b3b4297?w=400"}, {"n": "Rede", "f": "Pesca", "img": "https://images.unsplash.com/photo-1501703979959-79396f212591?w=400"}, {"n": "Anzol", "f": "Pesca", "img": "https://images.unsplash.com/photo-1516937941344-00b4e0337589?w=400"}, {"n": "Ânfora", "f": "Armazenar", "img": "https://images.unsplash.com/photo-1578507065211-1c4e99a5fd24?w=400"}],
+        "animais": [{"n": "Burro", "f": "Carga", "img": "https://images.unsplash.com/photo-1534145557161-469b768e987c?w=400"}, {"n": "Cão Água", "f": "Pesca", "img": "https://images.unsplash.com/photo-1598133894008-61f7fdb8cc3a?w=400"}, {"n": "Galinha", "f": "Ovos", "img": "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=400"}, {"n": "Abelha", "f": "Mel", "img": "https://images.unsplash.com/photo-1581404476143-fb31d742929f?w=400"}]
     },
     "4. Romanos": {
-        "coord": [38.4, -7.9], "info": "Império e Estradas.",
-        "ferramentas": [
-            {"n": "Gladius", "f": "Guerra", "kw": "roman-sword"},
-            {"n": "Moeda", "f": "Troca", "kw": "roman-coin"},
-            {"n": "Mosaico", "f": "Arte", "kw": "roman-mosaic"},
-            {"n": "Groma", "f": "Medição", "kw": "ancient-engineering"}
-        ],
-        "animais": [
-            {"n": "Boi", "f": "Arado", "kw": "oxen"},
-            {"n": "Mula", "f": "Carga", "kw": "mule"},
-            {"n": "Ganso", "f": "Guarda", "kw": "goose"},
-            {"n": "Cavalo", "f": "Correio", "kw": "roman-cavalry"}
-        ]
+        "coord": [38.4, -7.9], "info": "Pax Romana e Civilização.",
+        "ferramentas": [{"n": "Gladius", "f": "Guerra", "img": "https://images.unsplash.com/photo-1590256153835-bd3c4014292c?w=400"}, {"n": "Moeda", "f": "Comércio", "img": "https://images.unsplash.com/photo-1611085583191-a3b1a6a939db?w=400"}, {"n": "Mosaico", "f": "Arte", "img": "https://images.unsplash.com/photo-1576016770956-debb63d92058?w=400"}, {"n": "Groma", "f": "Medição", "img": "https://images.unsplash.com/photo-1503387762-592dea58ef21?w=400"}],
+        "animais": [{"n": "Boi", "f": "Arado", "img": "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=400"}, {"n": "Mula", "f": "Carga", "img": "https://images.unsplash.com/photo-1534145557161-469b768e987c?w=400"}, {"n": "Ganso", "f": "Guarda", "img": "https://images.unsplash.com/photo-1542316812-730623661600?w=400"}, {"n": "Cavalo", "f": "Correio", "img": "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=400"}]
     },
     "5. Visigodos": {
-        "coord": [38.1, -7.8], "info": "Reinos Germânicos.",
-        "ferramentas": [
-            {"n": "Fíbula", "f": "Adorno", "kw": "visigoth-jewelry"},
-            {"n": "Espada", "f": "Guerra", "kw": "medieval-sword"},
-            {"n": "Cruz", "f": "Religião", "kw": "visigoth-cross"},
-            {"n": "Escudo", "f": "Defesa", "kw": "wooden-shield"}
-        ],
-        "animais": [
-            {"n": "Falcão", "f": "Caça", "kw": "falcon"},
-            {"n": "Cavalo", "f": "Montaria", "kw": "knight-horse"},
-            {"n": "Cão", "f": "Caça", "kw": "hunting-dog"},
-            {"n": "Cabra", "f": "Leite", "kw": "goat"}
-        ]
+        "coord": [38.1, -7.8], "info": "Reinos Germânicos e Fíbulas.",
+        "ferramentas": [{"n": "Fíbula", "f": "Adorno", "img": "https://images.unsplash.com/photo-1611085583191-a3b1a6a939db?w=400"}, {"n": "Espada", "f": "Duelo", "img": "https://images.unsplash.com/photo-1590256153835-bd3c4014292c?w=400"}, {"n": "Cruz", "f": "Fé", "img": "https://images.unsplash.com/photo-1544427920-c49ccfb85579?w=400"}, {"n": "Escudo", "f": "Proteção", "img": "https://images.unsplash.com/photo-1615678815958-5d413b70b653?w=400"}],
+        "animais": [{"n": "Falcão", "f": "Caça", "img": "https://images.unsplash.com/photo-1506197072618-7ad5df6296df?w=400"}, {"n": "Cavalo", "f": "Montaria", "img": "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=400"}, {"n": "Cão", "f": "Caça", "img": "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400"}, {"n": "Cabra", "f": "Sustento", "img": "https://images.unsplash.com/photo-1524024973431-2ad916746881?w=400"}]
     },
     "6. Árabes": {
-        "coord": [37.2, -7.9], "info": "Al-Andalus e Ciência.",
-        "ferramentas": [
-            {"n": "Astrolábio", "f": "Astros", "kw": "astrolabe"},
-            {"n": "Nora", "f": "Água", "kw": "water-wheel"},
-            {"n": "Azulejo", "f": "Decoração", "kw": "arabic-tile"},
-            {"n": "Alaúde", "f": "Música", "kw": "lute-instrument"}
-        ],
-        "animais": [
-            {"n": "Camelo", "f": "Carga", "kw": "camel"},
-            {"n": "Cavalo", "f": "Guerra", "kw": "arabian-horse"},
-            {"n": "Pomba", "f": "Mensagem", "kw": "pigeon"},
-            {"n": "Gato", "f": "Pragas", "kw": "cat"}
-        ]
+        "coord": [37.2, -7.9], "info": "Inovação e Regadio.",
+        "ferramentas": [{"n": "Astrolábio", "f": "Navegação", "img": "https://images.unsplash.com/photo-1533134486753-c833f074868f?w=400"}, {"n": "Nora", "f": "Irrigação", "img": "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=400"}, {"n": "Azulejo", "f": "Decoração", "img": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400"}, {"n": "Alaúde", "f": "Música", "img": "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=400"}],
+        "animais": [{"n": "Camelo", "f": "Carga", "img": "https://images.unsplash.com/photo-1551029506-0807df4e2031?w=400"}, {"n": "Gineto", "f": "Guerra", "img": "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=400"}, {"n": "Pomba", "f": "Correio", "img": "https://images.unsplash.com/photo-1501901664534-534a42840673?w=400"}, {"n": "Gato", "f": "Limpeza", "img": "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400"}]
     },
     "7. Descobrimentos": {
-        "coord": [38.7, -9.2], "info": "Mar e Glória Mundial.",
-        "ferramentas": [
-            {"n": "Bússola", "f": "Rumo", "kw": "maritime-compass"},
-            {"n": "Caravela", "f": "Mar", "kw": "old-sailing-ship"},
-            {"n": "Mapa", "f": "Terra", "kw": "old-map"},
-            {"n": "Astrolábio", "f": "Estrelas", "kw": "navigation-tool"}
-        ],
-        "animais": [
-            {"n": "Papagaio", "f": "Exótico", "kw": "parrot"},
-            {"n": "Macaco", "f": "Exótico", "kw": "monkey"},
-            {"n": "Elefante", "f": "Rei", "kw": "elephant"},
-            {"n": "Cão Navio", "f": "Sentinela", "kw": "big-dog"}
-        ]
+        "coord": [38.7, -9.2], "info": "A Era das Navegações.",
+        "ferramentas": [{"n": "Bússola", "f": "Direção", "img": "https://images.unsplash.com/photo-1533630660533-0309e2518f83?w=400"}, {"n": "Caravela", "f": "Viagem", "img": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400"}, {"n": "Mapa", "f": "Mundo", "img": "https://images.unsplash.com/photo-1521295121783-8a321d551ad2?w=400"}, {"n": "Astrolábio", "f": "Latitude", "img": "https://images.unsplash.com/photo-1452723312111-3a7d0db0e024?w=400"}],
+        "animais": [{"n": "Papagaio", "f": "Exótico", "img": "https://images.unsplash.com/photo-1552728089-57bdde30fc3a?w=400"}, {"n": "Macaco", "f": "Exótico", "img": "https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?w=400"}, {"n": "Elefante", "f": "Poder", "img": "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?w=400"}, {"n": "Cão Navio", "f": "Guarda", "img": "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400"}]
     }
 }
 
 # --- SIDEBAR ---
 with st.sidebar:
     st.title("🏛️ MENU")
-    modo = st.radio("MODO:", ["Explorar Épocas", "Linha do Tempo (Slider)", "⭐ Minhas Tribos"])
-    if modo == "Explorar Épocas":
+    modo = st.radio("SELECIONAR MODO:", ["Explorar", "Linha do Tempo (Slider)", "⭐ Minhas Tribos"])
+    
+    if modo == "Explorar":
         item = st.selectbox("POVO:", list(db.keys()))
     elif modo == "Linha do Tempo (Slider)":
         item = st.select_slider("PASSE O TEMPO:", options=list(db.keys()))
     else:
         item = None
 
-# --- LÓGICA ---
+# --- LÓGICA DE EXIBIÇÃO ---
 if modo == "⭐ Minhas Tribos":
     st.title("As Minhas Tribos Favoritas")
     if not st.session_state.minhas_tribos:
-        st.warning("Ainda não és membro de nenhuma tribo.")
+        st.warning("Adiciona tribos favoritas no modo Explorar!")
     else:
         for t in st.session_state.minhas_tribos:
-            st.markdown(f"<div class='info-box'>🛡️ <b>{t}</b></div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='info-box'>🛡️ És membro da tribo: <b>{t}</b></div>", unsafe_allow_html=True)
 else:
     dados = db[item]
     st.title(item)
+    
     if st.button(f"➕ Entrar na Tribo {item}"):
         if item not in st.session_state.minhas_tribos:
             st.session_state.minhas_tribos.append(item)
-            st.rerun()
+            st.success(f"Entraste na tribo {item}!")
 
     st.markdown(f'<div class="info-box">{dados["info"]}</div>', unsafe_allow_html=True)
+    
+    # Mapa
     m = folium.Map(location=dados["coord"], zoom_start=7, tiles="CartoDB dark_matter")
     folium.Marker(dados["coord"], icon=folium.Icon(color="red")).add_to(m)
     st_folium(m, width="100%", height=300)
 
-    # SECÇÃO FERRAMENTAS (4 COLUNAS)
+    # Ferramentas (4 Colunas)
     st.markdown("<h3 class='section-title'>⚒️ Ferramentas</h3>", unsafe_allow_html=True)
     cf = st.columns(4)
     for i, f in enumerate(dados["ferramentas"]):
         with cf[i]:
-            # API DINÂMICA DO UNSPLASH POR KEYWORD
-            img_url = f"https://source.unsplash.com/featured/400x300?{f['kw']}"
-            st.markdown(f"""<div class="cc-card">)
-                <img src="{img_url}" class="img-box">
+            st.markdown(f"""<div class="cc-card">
+                <img src="{f['img']}" class="img-box">
                 <div class="label">NOME</div><div class="value">{f['n']}</div>
                 <div class="label">FUNÇÃO</div><div class="value">{f['f']}</div>
-            </div>""", unsafe_allow_html=
+            </div>""", unsafe_allow_html=True)
+
+    # Animais (4 Colunas)
+    st.markdown("<h3
